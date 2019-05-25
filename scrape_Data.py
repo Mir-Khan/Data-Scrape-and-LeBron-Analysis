@@ -29,7 +29,7 @@ rows = soup.select('tbody tr')
 
 row = rows[0]
 print(row)
-name = row.select_one('tr > td').text.strip()
+name = row.select_one('[data-stat=player]').text.strip()
 print(name)
 
 team = row.select_one('[data-stat=team_id]').text.strip()
@@ -53,7 +53,59 @@ advanced_pages = [
 ]
 
 data = []
+year = 2010  # This can be changed to whatever the starting year is
 
 for page in advanced_pages:
     r = requests.get(page)
-    soup
+    soup = BeautifulSoup(r.content, 'html.parser')
+    rows = soup.select('tbody tr')
+
+    for row in rows:
+        d = dict()
+        # The initial scraping threw back some errors, this is to address those specific erros
+        if row.select_one('[data-stat=g]').text.strip() != 'G' and row.select_one('[data-stat=per]').text.strip() != "" and row.select_one('[data-stat=ts_pct]').text.strip() != "":
+            d['Year'] = year
+            d['Name'] = row.select_one('[data-stat=player]').text.strip()
+            d['Position'] = row.select_one('[data-stat=pos]').text.strip()
+            d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
+            d['Games_Played'] = float(
+                row.select_one('[data-stat=g]').text.strip())
+            d['Minutes_Played'] = float(
+                row.select_one('[data-stat=mp]').text.strip())
+            d['PER'] = float(row.select_one('[data-stat=per]').text.strip())
+            d['TS_Percentage'] = float(row.select_one(
+                '[data-stat=ts_pct]').text.strip())
+            d['3PAr'] = float(row.select_one(
+                '[data-stat=fg3a_per_fga_pct]').text.strip())
+            d['FTr'] = float(row.select_one(
+                '[data-stat=fta_per_fga_pct]').text.strip())
+            d['ORB_Percentage'] = float(row.select_one(
+                '[data-stat=orb_pct]').text.strip())
+            d['DRB_Percentage'] = float(row.select_one(
+                '[data-stat=drb_pct]').text.strip())
+            d['TRB_Percentage'] = float(row.select_one(
+                '[data-stat=trb_pct]').text.strip())
+            d['AST_Percentage'] = float(row.select_one(
+                '[data-stat=ast_pct]').text.strip())
+            d['STL_Percentage'] = float(row.select_one(
+                '[data-stat=stl_pct]').text.strip())
+            d['BLK_Percentage'] = float(row.select_one(
+                '[data-stat=blk_pct]').text.strip())
+            d['TOV_Percentage'] = float(row.select_one(
+                '[data-stat=tov_pct]').text.strip())
+            d['USG_Percentage'] = float(row.select_one(
+                '[data-stat=usg_pct]').text.strip())
+            d['OWS'] = float(row.select_one('[data-stat=ows]').text.strip())
+            d['DWS'] = float(row.select_one('[data-stat=dws]').text.strip())
+            d['WS'] = float(row.select_one('[data-stat=ws]').text.strip())
+            d['OBPM'] = float(row.select_one('[data-stat=obpm]').text.strip())
+            d['DBPM'] = float(row.select_one('[data-stat=dbpm]').text.strip())
+            d['BPM'] = float(row.select_one('[data-stat=bpm]').text.strip())
+            d['VORP'] = float(row.select_one('[data-stat=vorp]').text.strip())
+
+            data.append(d)
+
+    year += 1
+    sleep(5)
+
+print(data[0])
