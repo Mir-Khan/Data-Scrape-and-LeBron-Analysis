@@ -1,0 +1,31 @@
+<tr class="full_table"><th class="right" csk="1" data-stat="ranker" scope="row">1</th>
+  <td class="left" csk="Afflalo,Arron" data-append-csv="afflaar01" data-stat="player">
+    <a href="/players/a/afflaar01.html">Arron Afflalo</a>
+  </td><td class="center" data-stat="pos">SG</td>
+  <td class="right" data-stat="age">24</td>
+  <td class="left" data-stat="team_id"><a href="/teams/DEN/2010.html">DEN</a></td>
+  <td class="right" data-stat="g">82</td>
+  <td class="right" data-stat="mp">2221</td>
+  <td class="right" data-stat="per">10.9</td>
+  <td class="right" data-stat="ts_pct">.576</td>
+  <td class="right" data-stat="fg3a_per_fga_pct">.426</td>
+  <td class="right" data-stat="fta_per_fga_pct">.168</td>
+  <td class="right" data-stat="orb_pct">3.1</td>
+  <td class="right" data-stat="drb_pct">9.9</td>
+  <td class="right" data-stat="trb_pct">6.5</td>
+  <td class="right" data-stat="ast_pct">9.3</td>
+  <td class="right" data-stat="stl_pct">1.0</td>
+  <td class="right" data-stat="blk_pct">1.0</td>
+  <td class="right" data-stat="tov_pct">10.5</td>
+  <td class="right" data-stat="usg_pct">14.0</td>
+  <td class="right iz" data-stat="ws-dum"></td>
+  <td class="right" data-stat="ows">2.8</td>
+  <td class="right" data-stat="dws">1.4</td>
+  <td class="right" data-stat="ws">4.3</td>
+  <td class="right" data-stat="ws_per_48">.092</td>
+  <td class="right iz" data-stat="bpm-dum"></td>
+  <td class="right" data-stat="obpm">0.8</td>
+  <td class="right" data-stat="dbpm">-0.5</td>
+  <td class="right" data-stat="bpm">0.3</td>
+  <td class="right" data-stat="vorp">1.3</td>
+</tr>
