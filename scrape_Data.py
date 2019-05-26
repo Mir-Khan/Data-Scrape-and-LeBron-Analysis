@@ -270,3 +270,92 @@ for page in per_100_poss:
 
 with open('per_100_possessions.json', 'w') as f:
     json.dump(data, f)
+
+#####################Multiple Total Pages####################################
+# Totals stats from 2010-2018
+total_pages = [
+    r'https://www.basketball-reference.com/leagues/NBA_2010_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2011_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2012_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2013_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2014_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2015_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2016_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2017_totals.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2018_totals.html'
+]
+
+data = []
+year = 2010  # This can be changed to whatever the starting year is
+
+for page in total_pages:
+    r = requests.get(page)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    rows = soup.select('tbody tr')
+
+    for row in rows:
+        d = dict()
+
+        if row.select_one('[data-stat=g]').text.strip() != 'G' and row.select_one('[data-stat=fg3_pct]').text.strip() != "" and row.select_one('[data-stat=ft_pct]').text.strip() != "" and row.select_one('[data-stat=fg2_pct]').text.strip() != "":
+            d['Year'] = year
+            d['Name'] = row.select_one('[data-stat=player]').text.strip()
+            d['Position'] = row.select_one('[data-stat=pos]').text.strip()
+            d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
+            d['Games_Played'] = float(
+                row.select_one('[data-stat=g]').text.strip())
+            d['Games_Started'] = float(
+                row.select_one('[data-stat=gs]').text.strip())
+            d['Minutes_Played'] = float(
+                row.select_one('[data-stat=mp]').text.strip())
+            d['FGM_Total'] = float(row.select_one(
+                '[data-stat=fg]').text.strip())
+            d['FGA_Total'] = float(row.select_one(
+                '[data-stat=fga]').text.strip())
+            d['FG_PCT'] = float(row.select_one(
+                '[data-stat=fg_pct]').text.strip())
+            d['3PM_Total'] = float(row.select_one(
+                '[data-stat=fg3]').text.strip())
+            d['3PA_Total'] = float(row.select_one(
+                '[data-stat=fg3a]').text.strip())
+            d['3P_PCT'] = float(row.select_one(
+                '[data-stat=fg3_pct]').text.strip())
+            d['2PM_Total'] = float(row.select_one(
+                '[data-stat=fg2]').text.strip())
+            d['2PA_Total'] = float(row.select_one(
+                '[data-stat=fg2a]').text.strip())
+            d['2P_PCT'] = float(row.select_one(
+                '[data-stat=fg2_pct]').text.strip())
+            d['EFG_PCT'] = float(row.select_one(
+                '[data-stat=efg_pct]').text.strip())
+            d['FTM_Total'] = float(row.select_one(
+                '[data-stat=ft]').text.strip())
+            d['FTA_Total'] = float(row.select_one(
+                '[data-stat=fta]').text.strip())
+            d['FT_PCT'] = float(row.select_one(
+                '[data-stat=ft_pct]').text.strip())
+            d['DRB_Total'] = float(row.select_one(
+                '[data-stat=drb]').text.strip())
+            d['ORB_Total'] = float(row.select_one(
+                '[data-stat=orb]').text.strip())
+            d['TRB_Total'] = float(row.select_one(
+                '[data-stat=trb]').text.strip())
+            d['AST_Total'] = float(row.select_one(
+                '[data-stat=ast]').text.strip())
+            d['STL_Total'] = float(row.select_one(
+                '[data-stat=stl]').text.strip())
+            d['BLK_Total'] = float(row.select_one(
+                '[data-stat=blk]').text.strip())
+            d['TOV_Total'] = float(row.select_one(
+                '[data-stat=tov]').text.strip())
+            d['Fouls_Total'] = float(row.select_one(
+                '[data-stat=pf]').text.strip())
+            d['Points_Total'] = float(row.select_one(
+                '[data-stat=pts]').text.strip())
+
+            data.append(d)
+
+    year += 1
+    sleep(3)
+
+with open('totals.json', 'w') as f:
+    json.dump(data, f)
