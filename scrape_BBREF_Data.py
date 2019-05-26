@@ -4,38 +4,37 @@ import urllib3
 from bs4 import BeautifulSoup
 import json
 
-# This is also me learning how to web-scrape properly
-# Functions taken from https://github.com/LearnDataSci/article-resources/blob/master/Ultimate%20Guide%20to%20Web%20Scraping/Part%201%20-%20Requests%20and%20BeautifulSoup/notebook.ipynb
+# This is also me learning how to web-scrape properly from https://github.com/LearnDataSci/article-resources/blob/master/Ultimate%20Guide%20to%20Web%20Scraping/Part%201%20-%20Requests%20and%20BeautifulSoup/notebook.ipynb
 
-#############################Functions#########################################
+############################Years from User#####################################
+user_start_year = 1990  # just want to make sure the start year lets the loop run
+user_end_year = 1992  # same story here
+loop_cont = True  # a boolean value that'll help the next loop
 
-
-def save_html(html, path):
-    with open(path, 'wb') as f:
-        f.write(html)
-
-
-def open_html(path):
-    with open(path, 'rb') as f:
-        return f.read()
-
+# 1979 is the last year before the last major statistic, 3-pointers, were actually recorded
+while (user_start_year > 1979 or user_end_year < 2020) and loop_cont:
+    try:
+        user_start_year = int(
+            input("What year would you like to start data collection?: "))
+        user_end_year = int(
+            input("What year would you like to end data collection?: "))
+        if user_start_year > 1979 and user_end_year < 2020:
+            loop_cont = False
+    except ValueError:
+        print("Please use an appropriate year. You must use whole numbers and cannot use anything prior to 1979 or after  2019")
+        continue
 
 #####################Multiple Advanced Page Scrape###########################
-# Advanced stats from 2010-2018
-advanced_pages = [
-    r'https://www.basketball-reference.com/leagues/NBA_2010_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2011_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2012_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2013_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2014_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2015_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2016_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2017_advanced.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2018_advanced.html'
-]
+advanced_pages = []
+counter = user_start_year
+while counter <= user_end_year:
+    total_input = f'https://www.basketball-reference.com/leagues/NBA_{counter}_advanced.html'
+    advanced_pages.append(total_input)
+    counter += 1
 
+year = user_start_year
 data = []
-year = 2010  # This can be changed to whatever the starting year is
+
 
 for page in advanced_pages:
     r = requests.get(page)
@@ -44,23 +43,42 @@ for page in advanced_pages:
 
     for row in rows:
         d = dict()
-        # The initial scraping threw back some errors, this is to address those specific erros
-        if row.select_one('[data-stat=g]').text.strip() != 'G' and row.select_one('[data-stat=per]').text.strip() != "" and row.select_one('[data-stat=ts_pct]').text.strip() != "":
+        # The initial scraping threw back some errors due to the initial structure of the HTML
+        if row.select_one('[data-stat=g]').text.strip() != 'G':
             d['Year'] = year
             d['Name'] = row.select_one('[data-stat=player]').text.strip()
             d['Position'] = row.select_one('[data-stat=pos]').text.strip()
+            d['Age'] = row.select_one('[data-stat=age]').text.strip()
             d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
             d['Games_Played'] = float(
                 row.select_one('[data-stat=g]').text.strip())
             d['Minutes_Played'] = float(
                 row.select_one('[data-stat=mp]').text.strip())
-            d['PER'] = float(row.select_one('[data-stat=per]').text.strip())
-            d['TS_Percentage'] = float(row.select_one(
-                '[data-stat=ts_pct]').text.strip())
-            d['3PAr'] = float(row.select_one(
-                '[data-stat=fg3a_per_fga_pct]').text.strip())
-            d['FTr'] = float(row.select_one(
-                '[data-stat=fta_per_fga_pct]').text.strip())
+            # Some fields gave back empty strings, this is to combat those fields and will be repeated often
+            if row.select_one('[data-stat=per]').text.strip() == "":
+                d['PER'] = float(0)
+            else:
+                d['PER'] = float(row.select_one(
+                    '[data-stat=per]').text.strip())
+
+            if row.select_one('[data-stat=ts_pct]').text.strip() == "":
+                d['TS_Percentage'] = float(0)
+            else:
+                d['TS_Percentage'] = float(row.select_one(
+                    '[data-stat=ts_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg3a_per_fga_pct]').text.strip() == "":
+                d['3PAr'] = float(0)
+            else:
+                d['3PAr'] = float(row.select_one(
+                    '[data-stat=fg3a_per_fga_pct]').text.strip())
+
+            if row.select_one('[data-stat=fta_per_fga_pct]').text.strip() == "":
+                d['FTr'] = float(0)
+            else:
+                d['FTr'] = float(row.select_one(
+                    '[data-stat=fta_per_fga_pct]').text.strip())
+
             d['ORB_Percentage'] = float(row.select_one(
                 '[data-stat=orb_pct]').text.strip())
             d['DRB_Percentage'] = float(row.select_one(
@@ -73,8 +91,13 @@ for page in advanced_pages:
                 '[data-stat=stl_pct]').text.strip())
             d['BLK_Percentage'] = float(row.select_one(
                 '[data-stat=blk_pct]').text.strip())
-            d['TOV_Percentage'] = float(row.select_one(
-                '[data-stat=tov_pct]').text.strip())
+
+            if row.select_one('[data-stat=tov_pct]').text.strip() == "":
+                d['TOV_Percentage'] = float(0)
+            else:
+                d['TOV_Percentage'] = float(row.select_one(
+                    '[data-stat=tov_pct]').text.strip())
+
             d['USG_Percentage'] = float(row.select_one(
                 '[data-stat=usg_pct]').text.strip())
             d['OWS'] = float(row.select_one('[data-stat=ows]').text.strip())
@@ -88,27 +111,21 @@ for page in advanced_pages:
             data.append(d)
 
     year += 1
-    sleep(5)
+    sleep(3)
 
 with open('advanced_stats.json', 'w') as f:
     json.dump(data, f)
 
 ########################Multiple per 36 Pages###################################
-# Per 36 Minutes stats from 2010-2018
-per_36_pages = [
-    r'https://www.basketball-reference.com/leagues/NBA_2010_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2011_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2012_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2013_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2014_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2015_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2016_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2017_per_minute.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2018_per_minute.html'
-]
+per_36_pages = []
+counter = user_start_year
+while counter <= user_end_year:
+    total_input = f'https://www.basketball-reference.com/leagues/NBA_{counter}_per_minute.html'
+    per_36_pages.append(total_input)
+    counter += 1
 
+year = user_start_year
 data = []
-year = 2010  # This can be changed to whatever the starting year is
 
 for page in per_36_pages:
     r = requests.get(page)
@@ -118,11 +135,12 @@ for page in per_36_pages:
     for row in rows:
         d = dict()
 
-        if row.select_one('[data-stat=g]').text.strip() != 'G' and row.select_one('[data-stat=fg3_pct]').text.strip() != "" and row.select_one('[data-stat=ft_pct]').text.strip() != "" and row.select_one('[data-stat=fg2_pct]').text.strip() != "":
+        if row.select_one('[data-stat=g]').text.strip() != 'G':
             d['Year'] = year
             d['Name'] = row.select_one('[data-stat=player]').text.strip()
             d['Position'] = row.select_one('[data-stat=pos]').text.strip()
             d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
+            d['Age'] = row.select_one('[data-stat=age]').text.strip()
             d['Games_Played'] = float(
                 row.select_one('[data-stat=g]').text.strip())
             d['Games_Started'] = float(
@@ -133,26 +151,46 @@ for page in per_36_pages:
                 '[data-stat=fg_per_mp]').text.strip())
             d['FGA_Per_36'] = float(row.select_one(
                 '[data-stat=fga_per_mp]').text.strip())
-            d['FG_PCT'] = float(row.select_one(
-                '[data-stat=fg_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg_pct]').text.strip() == "":
+                d['FG_PCT'] = float(0)
+            else:
+                d['FG_PCT'] = float(row.select_one(
+                    '[data-stat=fg_pct]').text.strip())
+
             d['3PM_Per_36'] = float(row.select_one(
                 '[data-stat=fg3_per_mp]').text.strip())
             d['3PA_Per_36'] = float(row.select_one(
                 '[data-stat=fg3a_per_mp]').text.strip())
-            d['3P_PCT'] = float(row.select_one(
-                '[data-stat=fg3_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
+                d['3P_PCT'] = float(0)
+            else:
+                d['3P_PCT'] = float(row.select_one(
+                    '[data-stat=fg3_pct]').text.strip())
+
             d['2PM_Per_36'] = float(row.select_one(
                 '[data-stat=fg2_per_mp]').text.strip())
             d['2PA_Per_36'] = float(row.select_one(
                 '[data-stat=fg2a_per_mp]').text.strip())
-            d['2P_PCT'] = float(row.select_one(
-                '[data-stat=fg2_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
+                d['2P_PCT'] = float(0)
+            else:
+                d['2P_PCT'] = float(row.select_one(
+                    '[data-stat=fg2_pct]').text.strip())
+
             d['FTM_Per_36'] = float(row.select_one(
                 '[data-stat=ft_per_mp]').text.strip())
             d['FTA_Per_36'] = float(row.select_one(
                 '[data-stat=fta_per_mp]').text.strip())
-            d['FT_PCT'] = float(row.select_one(
-                '[data-stat=ft_pct]').text.strip())
+
+            if row.select_one('[data-stat=ft_pct]').text.strip() == "":
+                d['FT_PCT'] = float(0)
+            else:
+                d['FT_PCT'] = float(row.select_one(
+                    '[data-stat=ft_pct]').text.strip())
+
             d['DRB_Per_36'] = float(row.select_one(
                 '[data-stat=drb_per_mp]').text.strip())
             d['ORB_Per_36'] = float(row.select_one(
@@ -181,21 +219,17 @@ with open('per_36.json', 'w') as f:
     json.dump(data, f)
 
 #####################Multiple per Game Pages####################################
-# Per 100 possessions stats from 2010-2018
-per_100_poss = [
-    r'https://www.basketball-reference.com/leagues/NBA_2010_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2011_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2012_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2013_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2014_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2015_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2016_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2017_per_poss.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2018_per_poss.html'
-]
+per_100_poss = []
 
+counter = user_start_year
+while counter <= user_end_year:
+    total_input = f'https://www.basketball-reference.com/leagues/NBA_{counter}_per_poss.html'
+    per_100_poss.append(total_input)
+    counter += 1
+
+year = user_start_year
 data = []
-year = 2010  # This can be changed to whatever the starting year is
+
 
 for page in per_100_poss:
     r = requests.get(page)
@@ -205,10 +239,11 @@ for page in per_100_poss:
     for row in rows:
         d = dict()
 
-        if row.select_one('[data-stat=g]').text.strip() != 'G' and row.select_one('[data-stat=fg3_pct]').text.strip() != "" and row.select_one('[data-stat=ft_pct]').text.strip() != "" and row.select_one('[data-stat=fg2_pct]').text.strip() != "":
+        if row.select_one('[data-stat=g]').text.strip() != 'G':
             d['Year'] = year
             d['Name'] = row.select_one('[data-stat=player]').text.strip()
             d['Position'] = row.select_one('[data-stat=pos]').text.strip()
+            d['Age'] = row.select_one('[data-stat=age]').text.strip()
             d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
             d['Games_Played'] = float(
                 row.select_one('[data-stat=g]').text.strip())
@@ -220,26 +255,46 @@ for page in per_100_poss:
                 '[data-stat=fg_per_poss]').text.strip())
             d['FGA_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=fga_per_poss]').text.strip())
-            d['FG_PCT'] = float(row.select_one(
-                '[data-stat=fg_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg_pct]').text.strip() == "":
+                d['FG_PCT'] = float(0)
+            else:
+                d['FG_PCT'] = float(row.select_one(
+                    '[data-stat=fg_pct]').text.strip())
+
             d['3PM_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=fg3_per_poss]').text.strip())
             d['3PA_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=fg3a_per_poss]').text.strip())
-            d['3P_PCT'] = float(row.select_one(
-                '[data-stat=fg3_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
+                d['3P_PCT'] = float(0)
+            else:
+                d['3P_PCT'] = float(row.select_one(
+                    '[data-stat=fg3_pct]').text.strip())
+
             d['2PM_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=fg2_per_poss]').text.strip())
             d['2PA_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=fg2a_per_poss]').text.strip())
-            d['2P_PCT'] = float(row.select_one(
-                '[data-stat=fg2_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
+                d['2P_PCT'] = float(0)
+            else:
+                d['2P_PCT'] = float(row.select_one(
+                    '[data-stat=fg2_pct]').text.strip())
+
             d['FTM_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=ft_per_poss]').text.strip())
             d['FTA_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=fta_per_poss]').text.strip())
-            d['FT_PCT'] = float(row.select_one(
-                '[data-stat=ft_pct]').text.strip())
+
+            if row.select_one('[data-stat=ft_pct]').text.strip() == "":
+                d['FT_PCT'] = float(0)
+            else:
+                d['FT_PCT'] = float(row.select_one(
+                    '[data-stat=ft_pct]').text.strip())
+
             d['DRB_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=drb_per_poss]').text.strip())
             d['ORB_Per_100_Possessions'] = float(row.select_one(
@@ -258,10 +313,18 @@ for page in per_100_poss:
                 '[data-stat=pf_per_poss]').text.strip())
             d['Points_Per_100_Possessions'] = float(row.select_one(
                 '[data-stat=pts_per_poss]').text.strip())
-            d['Offensive_Rating'] = float(row.select_one(
-                '[data-stat=off_rtg]').text.strip())
-            d['Defensive_Rating'] = float(row.select_one(
-                '[data-stat=def_rtg]').text.strip())
+
+            if row.select_one('[data-stat=off_rtg]').text.strip() == "":
+                d['Offensive_Rating'] = float(0)
+            else:
+                d['Offensive_Rating'] = float(
+                    row.select_one('[data-stat=off_rtg]').text.strip())
+
+            if row.select_one('[data-stat=def_rtg]').text.strip() == "":
+                d['Defensive_Rating'] = float(0)
+            else:
+                d['Defensive_Rating'] = float(row.select_one(
+                    '[data-stat=def_rtg]').text.strip())
 
             data.append(d)
 
@@ -272,21 +335,15 @@ with open('per_100_possessions.json', 'w') as f:
     json.dump(data, f)
 
 #####################Multiple Total Pages####################################
-# Totals stats from 2010-2018
-total_pages = [
-    r'https://www.basketball-reference.com/leagues/NBA_2010_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2011_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2012_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2013_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2014_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2015_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2016_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2017_totals.html',
-    r'https://www.basketball-reference.com/leagues/NBA_2018_totals.html'
-]
+total_pages = []
+counter = user_start_year
+while counter <= user_end_year:
+    total_input = f'https://www.basketball-reference.com/leagues/NBA_{counter}_totals.html'
+    total_pages.append(total_input)
+    counter += 1
 
+year = user_start_year
 data = []
-year = 2010  # This can be changed to whatever the starting year is
 
 for page in total_pages:
     r = requests.get(page)
@@ -296,10 +353,11 @@ for page in total_pages:
     for row in rows:
         d = dict()
 
-        if row.select_one('[data-stat=g]').text.strip() != 'G' and row.select_one('[data-stat=fg3_pct]').text.strip() != "" and row.select_one('[data-stat=ft_pct]').text.strip() != "" and row.select_one('[data-stat=fg2_pct]').text.strip() != "":
+        if row.select_one('[data-stat=g]').text.strip() != 'G':
             d['Year'] = year
             d['Name'] = row.select_one('[data-stat=player]').text.strip()
             d['Position'] = row.select_one('[data-stat=pos]').text.strip()
+            d['Age'] = row.select_one('[data-stat=age]').text.strip()
             d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
             d['Games_Played'] = float(
                 row.select_one('[data-stat=g]').text.strip())
@@ -311,28 +369,52 @@ for page in total_pages:
                 '[data-stat=fg]').text.strip())
             d['FGA_Total'] = float(row.select_one(
                 '[data-stat=fga]').text.strip())
-            d['FG_PCT'] = float(row.select_one(
-                '[data-stat=fg_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg_pct]').text.strip() == "":
+                d['FG_PCT'] = float(0)
+            else:
+                d['FG_PCT'] = float(row.select_one(
+                    '[data-stat=fg_pct]').text.strip())
+
             d['3PM_Total'] = float(row.select_one(
                 '[data-stat=fg3]').text.strip())
             d['3PA_Total'] = float(row.select_one(
                 '[data-stat=fg3a]').text.strip())
-            d['3P_PCT'] = float(row.select_one(
-                '[data-stat=fg3_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
+                d['3P_PCT'] = float(0)
+            else:
+                d['3P_PCT'] = float(row.select_one(
+                    '[data-stat=fg3_pct]').text.strip())
+
             d['2PM_Total'] = float(row.select_one(
                 '[data-stat=fg2]').text.strip())
             d['2PA_Total'] = float(row.select_one(
                 '[data-stat=fg2a]').text.strip())
-            d['2P_PCT'] = float(row.select_one(
-                '[data-stat=fg2_pct]').text.strip())
-            d['EFG_PCT'] = float(row.select_one(
-                '[data-stat=efg_pct]').text.strip())
+
+            if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
+                d['2P_PCT'] = float(0)
+            else:
+                d['2P_PCT'] = float(row.select_one(
+                    '[data-stat=fg2_pct]').text.strip())
+
+            if row.select_one('[data-stat=efg_pct]').text.strip() == "":
+                d['EFG_PCT'] = float(0)
+            else:
+                d['EFG_PCT'] = float(row.select_one(
+                    '[data-stat=efg_pct]').text.strip())
+
             d['FTM_Total'] = float(row.select_one(
                 '[data-stat=ft]').text.strip())
             d['FTA_Total'] = float(row.select_one(
                 '[data-stat=fta]').text.strip())
-            d['FT_PCT'] = float(row.select_one(
-                '[data-stat=ft_pct]').text.strip())
+
+            if row.select_one('[data-stat=ft_pct]').text.strip() == "":
+                d['FT_PCT'] = float(0)
+            else:
+                d['FT_PCT'] = float(row.select_one(
+                    '[data-stat=ft_pct]').text.strip())
+
             d['DRB_Total'] = float(row.select_one(
                 '[data-stat=drb]').text.strip())
             d['ORB_Total'] = float(row.select_one(
