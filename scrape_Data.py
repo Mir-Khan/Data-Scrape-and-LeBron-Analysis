@@ -2,6 +2,7 @@ from time import sleep
 import requests
 import urllib3
 from bs4 import BeautifulSoup
+import json
 
 # This is also me learning how to web-scrape properly
 # Functions taken from https://github.com/LearnDataSci/article-resources/blob/master/Ultimate%20Guide%20to%20Web%20Scraping/Part%201%20-%20Requests%20and%20BeautifulSoup/notebook.ipynb
@@ -18,25 +19,6 @@ def open_html(path):
     with open(path, 'rb') as f:
         return f.read()
 
-
-############################Initial Page Scrape#################################
-url_advanced = r'https://www.basketball-reference.com/leagues/NBA_2010_advanced.html'
-r = requests.get(url_advanced)
-print(r.content[:100])  # this is to check if we actually have the url
-
-soup = BeautifulSoup(r.content, 'html.parser')
-rows = soup.select('tbody tr')
-
-row = rows[0]
-print(row)
-name = row.select_one('[data-stat=player]').text.strip()
-print(name)
-
-team = row.select_one('[data-stat=team_id]').text.strip()
-print(team)
-
-gp = int(row.select_one('[data-stat=g]').text.strip())
-print(f"Arron Afflalo played {gp} games during the 2009-10 NBA season")
 
 #####################Multiple Advanced Page Scrape###########################
 # Advanced stats from 2010-2018
@@ -108,4 +90,92 @@ for page in advanced_pages:
     year += 1
     sleep(5)
 
-print(data[0])
+with open('advanced_stats.json', 'w') as f:
+    json.dump(data, f)
+
+########################Multiple per 36 Pages###################################
+# Per 36 Minutes stats from 2010-2018
+per_36_pages = [
+    r'https://www.basketball-reference.com/leagues/NBA_2010_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2011_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2012_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2013_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2014_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2015_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2016_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2017_per_minute.html',
+    r'https://www.basketball-reference.com/leagues/NBA_2018_per_minute.html'
+]
+
+data = []
+year = 2010  # This can be changed to whatever the starting year is
+
+for page in per_36_pages:
+    r = requests.get(page)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    rows = soup.select('tbody tr')
+
+    for row in rows:
+        d = dict()
+
+        if row.select_one('[data-stat=g]').text.strip() != 'G' and row.select_one('[data-stat=fg3_pct]').text.strip() != "" and row.select_one('[data-stat=ft_pct]').text.strip() != "" and row.select_one('[data-stat=fg2_pct]').text.strip() != "":
+            d['Year'] = year
+            d['Name'] = row.select_one('[data-stat=player]').text.strip()
+            d['Position'] = row.select_one('[data-stat=pos]').text.strip()
+            d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
+            d['Games_Played'] = float(
+                row.select_one('[data-stat=g]').text.strip())
+            d['Games_Started'] = float(
+                row.select_one('[data-stat=gs]').text.strip())
+            d['Minutes_Played'] = float(
+                row.select_one('[data-stat=mp]').text.strip())
+            d['FGM_Per_36'] = float(row.select_one(
+                '[data-stat=fg_per_mp]').text.strip())
+            d['FGA_Per_36'] = float(row.select_one(
+                '[data-stat=fga_per_mp]').text.strip())
+            d['FG_PCT_Per_36'] = float(row.select_one(
+                '[data-stat=fg_pct]').text.strip())
+            d['3PM_Per_36'] = float(row.select_one(
+                '[data-stat=fg3_per_mp]').text.strip())
+            d['3PA_Per_36'] = float(row.select_one(
+                '[data-stat=fg3a_per_mp]').text.strip())
+            d['3P_PCT_Per_36'] = float(row.select_one(
+                '[data-stat=fg3_pct]').text.strip())
+            d['2PM_Per_36'] = float(row.select_one(
+                '[data-stat=fg2_per_mp]').text.strip())
+            d['2PA_Per_36'] = float(row.select_one(
+                '[data-stat=fg2a_per_mp]').text.strip())
+            d['2P_PCT_Per_36'] = float(row.select_one(
+                '[data-stat=fg2_pct]').text.strip())
+            d['FTM_Per_36'] = float(row.select_one(
+                '[data-stat=ft_per_mp]').text.strip())
+            d['FTA_Per_36'] = float(row.select_one(
+                '[data-stat=fta_per_mp]').text.strip())
+            d['FT_PCT_Per_36'] = float(row.select_one(
+                '[data-stat=ft_pct]').text.strip())
+            d['DRB_Per_36'] = float(row.select_one(
+                '[data-stat=drb_per_mp]').text.strip())
+            d['ORB_Per_36'] = float(row.select_one(
+                '[data-stat=orb_per_mp]').text.strip())
+            d['TRB_Per_36'] = float(row.select_one(
+                '[data-stat=trb_per_mp]').text.strip())
+            d['AST_Per_36'] = float(row.select_one(
+                '[data-stat=ast_per_mp]').text.strip())
+            d['STL_Per_36'] = float(row.select_one(
+                '[data-stat=stl_per_mp]').text.strip())
+            d['BLK_Per_36'] = float(row.select_one(
+                '[data-stat=blk_per_mp]').text.strip())
+            d['TOV_Per_36'] = float(row.select_one(
+                '[data-stat=tov_per_mp]').text.strip())
+            d['Fouls_Per_36'] = float(row.select_one(
+                '[data-stat=pf_per_mp]').text.strip())
+            d['Points_Per_36'] = float(row.select_one(
+                '[data-stat=pts_per_mp]').text.strip())
+
+            data.append(d)
+
+    year += 1
+    sleep(5)
+
+with open('per_36.json', 'w') as f:
+    json.dump(data, f)
