@@ -4,15 +4,13 @@ import urllib3
 from bs4 import BeautifulSoup
 import json
 
-# This is also me learning how to web-scrape properly from https://github.com/LearnDataSci/article-resources/blob/master/Ultimate%20Guide%20to%20Web%20Scraping/Part%201%20-%20Requests%20and%20BeautifulSoup/notebook.ipynb
-
 ############################Years from User#####################################
-user_start_year = 1990  # just want to make sure the start year lets the loop run
+user_start_year = 1990  # just want to initialize this variable for the while loop
 user_end_year = 1992  # same story here
 loop_cont = True  # a boolean value that'll help the next loop
 
 # 1979 is the last year before the last major statistic, 3-pointers, were actually recorded
-while (user_start_year > 1979 or user_end_year < 2020) and loop_cont:
+while loop_cont:
     try:
         user_start_year = int(
             input("What year would you like to start data collection?: "))
@@ -23,6 +21,9 @@ while (user_start_year > 1979 or user_end_year < 2020) and loop_cont:
     except ValueError:
         print("Please use an appropriate year. You must use whole numbers and cannot use anything prior to 1979 or after  2019")
         continue
+
+# This is to dynamically create file names with the years given
+file_years = f'{user_start_year}-{user_end_year}_'
 
 #####################Multiple Advanced Page Scrape###########################
 advanced_pages = []
@@ -79,18 +80,41 @@ for page in advanced_pages:
                 d['FTr'] = float(row.select_one(
                     '[data-stat=fta_per_fga_pct]').text.strip())
 
-            d['ORB_Percentage'] = float(row.select_one(
-                '[data-stat=orb_pct]').text.strip())
-            d['DRB_Percentage'] = float(row.select_one(
-                '[data-stat=drb_pct]').text.strip())
-            d['TRB_Percentage'] = float(row.select_one(
-                '[data-stat=trb_pct]').text.strip())
-            d['AST_Percentage'] = float(row.select_one(
-                '[data-stat=ast_pct]').text.strip())
-            d['STL_Percentage'] = float(row.select_one(
-                '[data-stat=stl_pct]').text.strip())
-            d['BLK_Percentage'] = float(row.select_one(
-                '[data-stat=blk_pct]').text.strip())
+            if row.select_one('[data-stat=orb_pct]').text.strip() == "":
+                d['ORB_Percentage'] = float(0)
+            else:
+                d['ORB_Percentage'] = float(row.select_one(
+                    '[data-stat=orb_pct]').text.strip())
+
+            if row.select_one('[data-stat=drb_pct]').text.strip() == "":
+                d['DRB_Percentage'] = float(0)
+            else:
+                d['DRB_Percentage'] = float(row.select_one(
+                    '[data-stat=drb_pct]').text.strip())
+
+            if row.select_one('[data-stat=trb_pct]').text.strip() == "":
+                d['TRB_Percentage'] = float(0)
+            else:
+                d['TRB_Percentage'] = float(row.select_one(
+                    '[data-stat=trb_pct]').text.strip())
+
+            if row.select_one('[data-stat=ast_pct]').text.strip() == "":
+                d['AST_Percentage'] = float(0)
+            else:
+                d['AST_Percentage'] = float(row.select_one(
+                    '[data-stat=ast_pct]').text.strip())
+
+            if row.select_one('[data-stat=stl_pct]').text.strip() == "":
+                d['STL_Percentage'] = float(0)
+            else:
+                d['STL_Percentage'] = float(row.select_one(
+                    '[data-stat=stl_pct]').text.strip())
+
+            if row.select_one('[data-stat=blk_pct]').text.strip() == "":
+                d['BLK_Percentage'] = float(0)
+            else:
+                d['BLK_Percentage'] = float(row.select_one(
+                    '[data-stat=blk_pct]').text.strip())
 
             if row.select_one('[data-stat=tov_pct]').text.strip() == "":
                 d['TOV_Percentage'] = float(0)
@@ -98,8 +122,12 @@ for page in advanced_pages:
                 d['TOV_Percentage'] = float(row.select_one(
                     '[data-stat=tov_pct]').text.strip())
 
-            d['USG_Percentage'] = float(row.select_one(
-                '[data-stat=usg_pct]').text.strip())
+            if row.select_one('[data-stat=usg_pct]').text.strip() == "":
+                d['USG_Percentage'] = float(0)
+            else:
+                d['USG_Percentage'] = float(row.select_one(
+                    '[data-stat=usg_pct]').text.strip())
+
             d['OWS'] = float(row.select_one('[data-stat=ows]').text.strip())
             d['DWS'] = float(row.select_one('[data-stat=dws]').text.strip())
             d['WS'] = float(row.select_one('[data-stat=ws]').text.strip())
@@ -113,7 +141,7 @@ for page in advanced_pages:
     year += 1
     sleep(3)
 
-with open('advanced_stats.json', 'w') as f:
+with open(f'{file_years}advanced_stats.json', 'w') as f:
     json.dump(data, f)
 
 ########################Multiple per 36 Pages###################################
@@ -147,10 +175,18 @@ for page in per_36_pages:
                 row.select_one('[data-stat=gs]').text.strip())
             d['Minutes_Played'] = float(
                 row.select_one('[data-stat=mp]').text.strip())
-            d['FGM_Per_36'] = float(row.select_one(
-                '[data-stat=fg_per_mp]').text.strip())
-            d['FGA_Per_36'] = float(row.select_one(
-                '[data-stat=fga_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=fg_per_mp]').text.strip() == "":
+                d['FGM_Per_36'] = float(0)
+            else:
+                d['FGM_Per_36'] = float(row.select_one(
+                    '[data-stat=fg_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=fga_per_mp]').text.strip() == "":
+                d['FGA_Per_36'] = float(0)
+            else:
+                d['FGA_Per_36'] = float(row.select_one(
+                    '[data-stat=fga_per_mp]').text.strip())
 
             if row.select_one('[data-stat=fg_pct]').text.strip() == "":
                 d['FG_PCT'] = float(0)
@@ -158,10 +194,17 @@ for page in per_36_pages:
                 d['FG_PCT'] = float(row.select_one(
                     '[data-stat=fg_pct]').text.strip())
 
-            d['3PM_Per_36'] = float(row.select_one(
-                '[data-stat=fg3_per_mp]').text.strip())
-            d['3PA_Per_36'] = float(row.select_one(
-                '[data-stat=fg3a_per_mp]').text.strip())
+            if row.select_one('[data-stat=fg3_per_mp]').text.strip() == "":
+                d['3PM_Per_36'] = float(0)
+            else:
+                d['3PM_Per_36'] = float(row.select_one(
+                    '[data-stat=fg3_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=fg3a_per_mp]').text.strip() == "":
+                d['3PA_Per_36'] = float(0)
+            else:
+                d['3PA_Per_36'] = float(row.select_one(
+                    '[data-stat=fg3a_per_mp]').text.strip())
 
             if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
                 d['3P_PCT'] = float(0)
@@ -169,10 +212,17 @@ for page in per_36_pages:
                 d['3P_PCT'] = float(row.select_one(
                     '[data-stat=fg3_pct]').text.strip())
 
-            d['2PM_Per_36'] = float(row.select_one(
-                '[data-stat=fg2_per_mp]').text.strip())
-            d['2PA_Per_36'] = float(row.select_one(
-                '[data-stat=fg2a_per_mp]').text.strip())
+            if row.select_one('[data-stat=fg2_per_mp]').text.strip() == "":
+                d['2PM_Per_36'] = float(0)
+            else:
+                d['2PM_Per_36'] = float(row.select_one(
+                    '[data-stat=fg2_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=fg2a_per_mp]').text.strip() == "":
+                d['2PA_Per_36'] = float(0)
+            else:
+                d['2PA_Per_36'] = float(row.select_one(
+                    '[data-stat=fg2a_per_mp]').text.strip())
 
             if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
                 d['2P_PCT'] = float(0)
@@ -180,10 +230,17 @@ for page in per_36_pages:
                 d['2P_PCT'] = float(row.select_one(
                     '[data-stat=fg2_pct]').text.strip())
 
-            d['FTM_Per_36'] = float(row.select_one(
-                '[data-stat=ft_per_mp]').text.strip())
-            d['FTA_Per_36'] = float(row.select_one(
-                '[data-stat=fta_per_mp]').text.strip())
+            if row.select_one('[data-stat=ft_per_mp]').text.strip() == "":
+                d['FTM_Per_36'] = float(0)
+            else:
+                d['FTM_Per_36'] = float(row.select_one(
+                    '[data-stat=ft_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=fta_per_mp]').text.strip() == "":
+                d['FTA_Per_36'] = float(0)
+            else:
+                d['FTA_Per_36'] = float(row.select_one(
+                    '[data-stat=fta_per_mp]').text.strip())
 
             if row.select_one('[data-stat=ft_pct]').text.strip() == "":
                 d['FT_PCT'] = float(0)
@@ -191,31 +248,66 @@ for page in per_36_pages:
                 d['FT_PCT'] = float(row.select_one(
                     '[data-stat=ft_pct]').text.strip())
 
-            d['DRB_Per_36'] = float(row.select_one(
-                '[data-stat=drb_per_mp]').text.strip())
-            d['ORB_Per_36'] = float(row.select_one(
-                '[data-stat=orb_per_mp]').text.strip())
-            d['TRB_Per_36'] = float(row.select_one(
-                '[data-stat=trb_per_mp]').text.strip())
-            d['AST_Per_36'] = float(row.select_one(
-                '[data-stat=ast_per_mp]').text.strip())
-            d['STL_Per_36'] = float(row.select_one(
-                '[data-stat=stl_per_mp]').text.strip())
-            d['BLK_Per_36'] = float(row.select_one(
-                '[data-stat=blk_per_mp]').text.strip())
-            d['TOV_Per_36'] = float(row.select_one(
-                '[data-stat=tov_per_mp]').text.strip())
-            d['Fouls_Per_36'] = float(row.select_one(
-                '[data-stat=pf_per_mp]').text.strip())
-            d['Points_Per_36'] = float(row.select_one(
-                '[data-stat=pts_per_mp]').text.strip())
+            if row.select_one('[data-stat=drb_per_mp]').text.strip() == "":
+                d['DRB_Per_36'] = float(0)
+            else:
+                d['DRB_Per_36'] = float(row.select_one(
+                    '[data-stat=drb_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=orb_per_mp]').text.strip() == "":
+                d['ORB_Per_36'] = float(0)
+            else:
+                d['ORB_Per_36'] = float(row.select_one(
+                    '[data-stat=orb_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=trb_per_mp]').text.strip() == "":
+                d['TRB_Per_36'] = float(0)
+            else:
+                d['TRB_Per_36'] = float(row.select_one(
+                    '[data-stat=trb_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=ast_per_mp]').text.strip() == "":
+                d['AST_Per_36'] = float(0)
+            else:
+                d['AST_Per_36'] = float(row.select_one(
+                    '[data-stat=ast_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=stl_per_mp]').text.strip() == "":
+                d['STL_Per_36'] = float(0)
+            else:
+                d['STL_Per_36'] = float(row.select_one(
+                    '[data-stat=stl_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=blk_per_mp]').text.strip() == "":
+                d['BLK_Per_36'] = float(0)
+            else:
+                d['BLK_Per_36'] = float(row.select_one(
+                    '[data-stat=blk_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=tov_per_mp]').text.strip() == "":
+                d['TOV_Per_36'] = float(0)
+            else:
+                d['TOV_Per_36'] = float(row.select_one(
+                    '[data-stat=tov_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=pf_per_mp]').text.strip() == "":
+                d['Fouls_Per_36'] = float(0)
+            else:
+                d['Fouls_Per_36'] = float(row.select_one(
+                    '[data-stat=pf_per_mp]').text.strip())
+
+            if row.select_one('[data-stat=pts_per_mp]').text.strip() == "":
+                d['Points_Per_36'] = float(0)
+            else:
+                d['Points_Per_36'] = float(row.select_one(
+                    '[data-stat=pts_per_mp]').text.strip())
 
             data.append(d)
 
     year += 1
     sleep(3)
 
-with open('per_36.json', 'w') as f:
+with open(f'{file_years}per_36.json', 'w') as f:
     json.dump(data, f)
 
 #####################Multiple per Game Pages####################################
@@ -251,10 +343,18 @@ for page in per_100_poss:
                 row.select_one('[data-stat=gs]').text.strip())
             d['Minutes_Played'] = float(
                 row.select_one('[data-stat=mp]').text.strip())
-            d['FGM_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=fg_per_poss]').text.strip())
-            d['FGA_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=fga_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=fg_per_poss]').text.strip() == "":
+                d['FGM_Per_100_Posessions'] = float(0)
+            else:
+                d['FGM_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=fg_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=fga_per_poss]').text.strip() == "":
+                d['FGA_Per_100_Posessions'] = float(0)
+            else:
+                d['FGA_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=fga_per_poss]').text.strip())
 
             if row.select_one('[data-stat=fg_pct]').text.strip() == "":
                 d['FG_PCT'] = float(0)
@@ -262,10 +362,17 @@ for page in per_100_poss:
                 d['FG_PCT'] = float(row.select_one(
                     '[data-stat=fg_pct]').text.strip())
 
-            d['3PM_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=fg3_per_poss]').text.strip())
-            d['3PA_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=fg3a_per_poss]').text.strip())
+            if row.select_one('[data-stat=fg3_per_poss]').text.strip() == "":
+                d['3PM_Per_100_Posessions'] = float(0)
+            else:
+                d['3PM_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=fg3_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=fg3a_per_poss]').text.strip() == "":
+                d['3PA_Per_100_Posessions'] = float(0)
+            else:
+                d['3PA_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=fg3a_per_poss]').text.strip())
 
             if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
                 d['3P_PCT'] = float(0)
@@ -273,10 +380,17 @@ for page in per_100_poss:
                 d['3P_PCT'] = float(row.select_one(
                     '[data-stat=fg3_pct]').text.strip())
 
-            d['2PM_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=fg2_per_poss]').text.strip())
-            d['2PA_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=fg2a_per_poss]').text.strip())
+            if row.select_one('[data-stat=fg2_per_poss]').text.strip() == "":
+                d['2PM_Per_100_Posessions'] = float(0)
+            else:
+                d['2PM_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=fg2_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=fg2a_per_poss]').text.strip() == "":
+                d['2PA_Per_100_Posessions'] = float(0)
+            else:
+                d['2PA_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=fg2a_per_poss]').text.strip())
 
             if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
                 d['2P_PCT'] = float(0)
@@ -284,10 +398,17 @@ for page in per_100_poss:
                 d['2P_PCT'] = float(row.select_one(
                     '[data-stat=fg2_pct]').text.strip())
 
-            d['FTM_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=ft_per_poss]').text.strip())
-            d['FTA_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=fta_per_poss]').text.strip())
+            if row.select_one('[data-stat=ft_per_poss]').text.strip() == "":
+                d['FTM_Per_100_Posessions'] = float(0)
+            else:
+                d['FTM_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=ft_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=fta_per_poss]').text.strip() == "":
+                d['FTA_Per_100_Posessions'] = float(0)
+            else:
+                d['FTA_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=fta_per_poss]').text.strip())
 
             if row.select_one('[data-stat=ft_pct]').text.strip() == "":
                 d['FT_PCT'] = float(0)
@@ -295,24 +416,59 @@ for page in per_100_poss:
                 d['FT_PCT'] = float(row.select_one(
                     '[data-stat=ft_pct]').text.strip())
 
-            d['DRB_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=drb_per_poss]').text.strip())
-            d['ORB_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=orb_per_poss]').text.strip())
-            d['TRB_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=trb_per_poss]').text.strip())
-            d['AST_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=ast_per_poss]').text.strip())
-            d['STL_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=stl_per_poss]').text.strip())
-            d['BLK_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=blk_per_poss]').text.strip())
-            d['TOV_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=tov_per_poss]').text.strip())
-            d['Fouls_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=pf_per_poss]').text.strip())
-            d['Points_Per_100_Possessions'] = float(row.select_one(
-                '[data-stat=pts_per_poss]').text.strip())
+            if row.select_one('[data-stat=drb_per_poss]').text.strip() == "":
+                d['DRB_Per_100_Posessions'] = float(0)
+            else:
+                d['DRB_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=drb_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=orb_per_poss]').text.strip() == "":
+                d['ORB_Per_100_Posessions'] = float(0)
+            else:
+                d['ORB_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=orb_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=trb_per_poss]').text.strip() == "":
+                d['TRB_Per_100_Posessions'] = float(0)
+            else:
+                d['TRB_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=trb_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=ast_per_poss]').text.strip() == "":
+                d['AST_Per_100_Posessions'] = float(0)
+            else:
+                d['AST_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=ast_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=stl_per_poss]').text.strip() == "":
+                d['STL_Per_100_Posessions'] = float(0)
+            else:
+                d['STL_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=stl_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=blk_per_poss]').text.strip() == "":
+                d['BLK_Per_100_Posessions'] = float(0)
+            else:
+                d['BLK_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=blk_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=tov_per_poss]').text.strip() == "":
+                d['TOV_Per_100_Posessions'] = float(0)
+            else:
+                d['TOV_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=tov_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=pf_per_poss]').text.strip() == "":
+                d['Fouls_Per_100_Posessions'] = float(0)
+            else:
+                d['Fouls_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=pf_per_poss]').text.strip())
+
+            if row.select_one('[data-stat=pts_per_poss]').text.strip() == "":
+                d['Points_Per_100_Posessions'] = float(0)
+            else:
+                d['Points_Per_100_Posessions'] = float(row.select_one(
+                    '[data-stat=pts_per_poss]').text.strip())
 
             if row.select_one('[data-stat=off_rtg]').text.strip() == "":
                 d['Offensive_Rating'] = float(0)
@@ -331,7 +487,7 @@ for page in per_100_poss:
     year += 1
     sleep(3)
 
-with open('per_100_possessions.json', 'w') as f:
+with open(f'{file_years}per_100_possessions.json', 'w') as f:
     json.dump(data, f)
 
 #####################Multiple Total Pages####################################
@@ -439,5 +595,5 @@ for page in total_pages:
     year += 1
     sleep(3)
 
-with open('totals.json', 'w') as f:
+with open(f'{file_years}totals.json', 'w') as f:
     json.dump(data, f)
