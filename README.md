@@ -14,11 +14,11 @@ The script makes sure that the user doesn't enter an incorrect year, and compile
 - Season Totals
 
 #### Notes about the Script
-Files will be outputted in JSON format, with the naming schema STARTyear-ENDyear_stat.JSON.
+- Files will be outputted in JSON format, with the naming schema STARTyear-ENDyear_stat.JSON.
 
-Due to the nature of the actual source of the data, I encountered the problem of some of the fields in the HTML table (namely fields that involved ratios) outputting empty strings because of an empty field in the HTML itself.
+- Due to the nature of the actual source of the data, I encountered the problem of some of the fields in the HTML table (namely fields that involved ratios) outputting empty strings because of an empty field in the HTML itself.
 
-In order to combat this, and to make sure that the entirety of a row was taken if it contained data, code in the scripts actually scraping the data looked like the following:
+  - In order to combat this, and to make sure that the entirety of a row was taken if it contained data, code in the scripts actually scraping the data looked like the following:
 ```python
 if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
           d['3P_PCT'] = float(0)
@@ -27,6 +27,8 @@ if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
               '[data-stat=fg3_pct]').text.strip())
 ```
 
-This isn't necessarily the most efficient way to get around the problem but it was the simplest one I could think of at the time. For this reason, data collection may be more resource intensive than I initially desired.
+  - This isn't necessarily the most efficient way to get around the problem but it was the simplest one I could think of at the time. For this reason, data collection may be more resource intensive than I initially desired.
 
-This may or may not be optimized in the future, but as of writing this I opted to leave this alone as the script works fine. 
+  - This may or may not be optimized in the future, but as of writing this I opted to leave this alone as the script works fine.
+
+- Increasing the range of the number of years you're scraping will significantly impact the amount of time you're waiting for the script to do its job.

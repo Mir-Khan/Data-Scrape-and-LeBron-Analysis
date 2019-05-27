@@ -9,7 +9,6 @@ user_start_year = 1990  # just want to initialize this variable for the while lo
 user_end_year = 1992  # same story here
 loop_cont = True  # a boolean value that'll help the next loop
 
-# 1979 is the last year before the last major statistic, 3-pointers, were actually recorded
 while loop_cont:
     try:
         user_start_year = int(
