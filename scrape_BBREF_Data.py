@@ -28,729 +28,827 @@ def userYears():
     return start, end
 
 
-reg_play = choice.Menu(['Playoffs', 'Regular Season', 'Both']).ask()
-years = userYears()
-
-if any("leagues" in s for s in advanced_pages):
-    print("Yeah")
-
-#####Functions###
-
-
 def per_game_scrape(start_year, page_list):
-    data = []
-    for page in page_list:
-        r = requests.get(page)
-        soup = BeautifulSoup(r.content, 'html.parser')
-        rows = soup.select('tbody tr')
+    tp = "perG"
+    page_list = list_creator(reg_play, start_year, end_year, tp)
 
-        for row in rows:
-            d = dict()
+    def actual_scrape(start_year, end_year, page_list, fileNameEnd):
+        data = []
+        file_start = start_year  # did this for the file name
+        for page in page_list:
+            r = requests.get(page)
+            soup = BeautifulSoup(r.content, 'html.parser')
+            rows = soup.select('tbody tr')
 
-            if row.select_one('[data-stat=g]').text.strip() != 'G':
-                d['Year'] = start_year
-                d['Name'] = row.select_one('[data-stat=player]').text.strip()
-                d['Position'] = row.select_one('[data-stat=pos]').text.strip()
-                d['Age'] = row.select_one('[data-stat=age]').text.strip()
-                d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
-                d['Games_Played'] = float(
-                    row.select_one('[data-stat=g]').text.strip())
-                d['Games_Started'] = float(
-                    row.select_one('[data-stat=gs]').text.strip())
+            for row in rows:
+                d = dict()
 
-                if row.select_one('[data-stat=mp_per_g]').text.strip() == "":
-                    d['Minutes_Played_Per_Game'] = float(0)
-                else:
-                    d['Minutes_Played_Per_Game'] = float(
-                        row.select_one('[data-stat=mp_per_g]').text.strip())
+                if row.select_one('[data-stat=g]').text.strip() != 'G':
+                    d['Year'] = start_year
+                    d['Name'] = row.select_one(
+                        '[data-stat=player]').text.strip()
+                    d['Position'] = row.select_one(
+                        '[data-stat=pos]').text.strip()
+                    d['Age'] = row.select_one('[data-stat=age]').text.strip()
+                    d['Team'] = row.select_one(
+                        '[data-stat=team_id]').text.strip()
+                    d['Games_Played'] = float(
+                        row.select_one('[data-stat=g]').text.strip())
+                    d['Games_Started'] = float(
+                        row.select_one('[data-stat=gs]').text.strip())
 
-                if row.select_one('[data-stat=fg_per_g]').text.strip() == "":
-                    d['FGM_Per_Game'] = float(0)
-                else:
-                    d['FGM_Per_Game'] = float(row.select_one(
-                        '[data-stat=fg_per_g]').text.strip())
+                    if row.select_one('[data-stat=mp_per_g]').text.strip() == "":
+                        d['Minutes_Played_Per_Game'] = float(0)
+                    else:
+                        d['Minutes_Played_Per_Game'] = float(
+                            row.select_one('[data-stat=mp_per_g]').text.strip())
 
-                if row.select_one('[data-stat=fga_per_g]').text.strip() == "":
-                    d['FGA_Per_Game'] = float(0)
-                else:
-                    d['FGA_Per_Game'] = float(row.select_one(
-                        '[data-stat=fga_per_g]').text.strip())
+                    if row.select_one('[data-stat=fg_per_g]').text.strip() == "":
+                        d['FGM_Per_Game'] = float(0)
+                    else:
+                        d['FGM_Per_Game'] = float(row.select_one(
+                            '[data-stat=fg_per_g]').text.strip())
 
-                if row.select_one('[data-stat=fg_pct]').text.strip() == "":
-                    d['FG_PCT'] = float(0)
-                else:
-                    d['FG_PCT'] = float(row.select_one(
-                        '[data-stat=fg_pct]').text.strip())
+                    if row.select_one('[data-stat=fga_per_g]').text.strip() == "":
+                        d['FGA_Per_Game'] = float(0)
+                    else:
+                        d['FGA_Per_Game'] = float(row.select_one(
+                            '[data-stat=fga_per_g]').text.strip())
 
-                if row.select_one('[data-stat=fg3_per_g]').text.strip() == "":
-                    d['3PM_Per_Game'] = float(0)
-                else:
-                    d['3PM_Per_Game'] = float(row.select_one(
-                        '[data-stat=fg3_per_g]').text.strip())
+                    if row.select_one('[data-stat=fg_pct]').text.strip() == "":
+                        d['FG_PCT'] = float(0)
+                    else:
+                        d['FG_PCT'] = float(row.select_one(
+                            '[data-stat=fg_pct]').text.strip())
 
-                if row.select_one('[data-stat=fg3a_per_g]').text.strip() == "":
-                    d['3PA_Per_Game'] = float(0)
-                else:
-                    d['3PA_Per_Game'] = float(row.select_one(
-                        '[data-stat=fg3a_per_g]').text.strip())
+                    if row.select_one('[data-stat=fg3_per_g]').text.strip() == "":
+                        d['3PM_Per_Game'] = float(0)
+                    else:
+                        d['3PM_Per_Game'] = float(row.select_one(
+                            '[data-stat=fg3_per_g]').text.strip())
 
-                if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
-                    d['3P_PCT'] = float(0)
-                else:
-                    d['3P_PCT'] = float(row.select_one(
-                        '[data-stat=fg3_pct]').text.strip())
+                    if row.select_one('[data-stat=fg3a_per_g]').text.strip() == "":
+                        d['3PA_Per_Game'] = float(0)
+                    else:
+                        d['3PA_Per_Game'] = float(row.select_one(
+                            '[data-stat=fg3a_per_g]').text.strip())
 
-                if row.select_one('[data-stat=fg2_per_g]').text.strip() == "":
-                    d['2PM_Per_Game'] = float(0)
-                else:
-                    d['2PM_Per_Game'] = float(row.select_one(
-                        '[data-stat=fg2_per_g]').text.strip())
+                    if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
+                        d['3P_PCT'] = float(0)
+                    else:
+                        d['3P_PCT'] = float(row.select_one(
+                            '[data-stat=fg3_pct]').text.strip())
 
-                if row.select_one('[data-stat=fg2a_per_g]').text.strip() == "":
-                    d['2PA_Per_Game'] = float(0)
-                else:
-                    d['2PA_Per_Game'] = float(row.select_one(
-                        '[data-stat=fg2a_per_g]').text.strip())
+                    if row.select_one('[data-stat=fg2_per_g]').text.strip() == "":
+                        d['2PM_Per_Game'] = float(0)
+                    else:
+                        d['2PM_Per_Game'] = float(row.select_one(
+                            '[data-stat=fg2_per_g]').text.strip())
 
-                if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
-                    d['2P_PCT'] = float(0)
-                else:
-                    d['2P_PCT'] = float(row.select_one(
-                        '[data-stat=fg2_pct]').text.strip())
+                    if row.select_one('[data-stat=fg2a_per_g]').text.strip() == "":
+                        d['2PA_Per_Game'] = float(0)
+                    else:
+                        d['2PA_Per_Game'] = float(row.select_one(
+                            '[data-stat=fg2a_per_g]').text.strip())
 
-                if row.select_one('[data-stat=ft_per_g]').text.strip() == "":
-                    d['FTM_Per_Game'] = float(0)
-                else:
-                    d['FTM_Per_Game'] = float(row.select_one(
-                        '[data-stat=ft_per_g]').text.strip())
+                    if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
+                        d['2P_PCT'] = float(0)
+                    else:
+                        d['2P_PCT'] = float(row.select_one(
+                            '[data-stat=fg2_pct]').text.strip())
 
-                if row.select_one('[data-stat=fta_per_g]').text.strip() == "":
-                    d['FTA_Per_Game'] = float(0)
-                else:
-                    d['FTA_Per_Game'] = float(row.select_one(
-                        '[data-stat=fta_per_g]').text.strip())
+                    if row.select_one('[data-stat=ft_per_g]').text.strip() == "":
+                        d['FTM_Per_Game'] = float(0)
+                    else:
+                        d['FTM_Per_Game'] = float(row.select_one(
+                            '[data-stat=ft_per_g]').text.strip())
 
-                if row.select_one('[data-stat=ft_pct]').text.strip() == "":
-                    d['FT_PCT'] = float(0)
-                else:
-                    d['FT_PCT'] = float(row.select_one(
-                        '[data-stat=ft_pct]').text.strip())
+                    if row.select_one('[data-stat=fta_per_g]').text.strip() == "":
+                        d['FTA_Per_Game'] = float(0)
+                    else:
+                        d['FTA_Per_Game'] = float(row.select_one(
+                            '[data-stat=fta_per_g]').text.strip())
 
-                if row.select_one('[data-stat=drb_per_g]').text.strip() == "":
-                    d['DRB_Per_Game'] = float(0)
-                else:
-                    d['DRB_Per_Game'] = float(row.select_one(
-                        '[data-stat=drb_per_g]').text.strip())
+                    if row.select_one('[data-stat=ft_pct]').text.strip() == "":
+                        d['FT_PCT'] = float(0)
+                    else:
+                        d['FT_PCT'] = float(row.select_one(
+                            '[data-stat=ft_pct]').text.strip())
 
-                if row.select_one('[data-stat=orb_per_g]').text.strip() == "":
-                    d['ORB_Per_Game'] = float(0)
-                else:
-                    d['ORB_Per_Game'] = float(row.select_one(
-                        '[data-stat=orb_per_g]').text.strip())
+                    if row.select_one('[data-stat=drb_per_g]').text.strip() == "":
+                        d['DRB_Per_Game'] = float(0)
+                    else:
+                        d['DRB_Per_Game'] = float(row.select_one(
+                            '[data-stat=drb_per_g]').text.strip())
 
-                if row.select_one('[data-stat=trb_per_g]').text.strip() == "":
-                    d['TRB_Per_Game'] = float(0)
-                else:
-                    d['TRB_Per_Game'] = float(row.select_one(
-                        '[data-stat=trb_per_g]').text.strip())
+                    if row.select_one('[data-stat=orb_per_g]').text.strip() == "":
+                        d['ORB_Per_Game'] = float(0)
+                    else:
+                        d['ORB_Per_Game'] = float(row.select_one(
+                            '[data-stat=orb_per_g]').text.strip())
 
-                if row.select_one('[data-stat=ast_per_g]').text.strip() == "":
-                    d['AST_Per_Game'] = float(0)
-                else:
-                    d['AST_Per_Game'] = float(row.select_one(
-                        '[data-stat=ast_per_g]').text.strip())
+                    if row.select_one('[data-stat=trb_per_g]').text.strip() == "":
+                        d['TRB_Per_Game'] = float(0)
+                    else:
+                        d['TRB_Per_Game'] = float(row.select_one(
+                            '[data-stat=trb_per_g]').text.strip())
 
-                if row.select_one('[data-stat=stl_per_g]').text.strip() == "":
-                    d['STL_Per_Game'] = float(0)
-                else:
-                    d['STL_Per_Game'] = float(row.select_one(
-                        '[data-stat=stl_per_g]').text.strip())
+                    if row.select_one('[data-stat=ast_per_g]').text.strip() == "":
+                        d['AST_Per_Game'] = float(0)
+                    else:
+                        d['AST_Per_Game'] = float(row.select_one(
+                            '[data-stat=ast_per_g]').text.strip())
 
-                if row.select_one('[data-stat=blk_per_g]').text.strip() == "":
-                    d['BLK_Per_Game'] = float(0)
-                else:
-                    d['BLK_Per_Game'] = float(row.select_one(
-                        '[data-stat=blk_per_g]').text.strip())
+                    if row.select_one('[data-stat=stl_per_g]').text.strip() == "":
+                        d['STL_Per_Game'] = float(0)
+                    else:
+                        d['STL_Per_Game'] = float(row.select_one(
+                            '[data-stat=stl_per_g]').text.strip())
 
-                if row.select_one('[data-stat=tov_per_g]').text.strip() == "":
-                    d['TOV_Per_Game'] = float(0)
-                else:
-                    d['TOV_Per_Game'] = float(row.select_one(
-                        '[data-stat=tov_per_g]').text.strip())
+                    if row.select_one('[data-stat=blk_per_g]').text.strip() == "":
+                        d['BLK_Per_Game'] = float(0)
+                    else:
+                        d['BLK_Per_Game'] = float(row.select_one(
+                            '[data-stat=blk_per_g]').text.strip())
 
-                if row.select_one('[data-stat=pf_per_g]').text.strip() == "":
-                    d['Fouls_Per_Game'] = float(0)
-                else:
-                    d['Fouls_Per_Game'] = float(row.select_one(
-                        '[data-stat=pf_per_g]').text.strip())
+                    if row.select_one('[data-stat=tov_per_g]').text.strip() == "":
+                        d['TOV_Per_Game'] = float(0)
+                    else:
+                        d['TOV_Per_Game'] = float(row.select_one(
+                            '[data-stat=tov_per_g]').text.strip())
 
-                if row.select_one('[data-stat=pts_per_g]').text.strip() == "":
-                    d['Points_Per_Game'] = float(0)
-                else:
-                    d['Points_Per_Game'] = float(row.select_one(
-                        '[data-stat=pts_per_g]').text.strip())
+                    if row.select_one('[data-stat=pf_per_g]').text.strip() == "":
+                        d['Fouls_Per_Game'] = float(0)
+                    else:
+                        d['Fouls_Per_Game'] = float(row.select_one(
+                            '[data-stat=pf_per_g]').text.strip())
 
-                data.append(d)
+                    if row.select_one('[data-stat=pts_per_g]').text.strip() == "":
+                        d['Points_Per_Game'] = float(0)
+                    else:
+                        d['Points_Per_Game'] = float(row.select_one(
+                            '[data-stat=pts_per_g]').text.strip())
 
-        start_year += 1
-        sleep(3)
+                    data.append(d)
 
-    with open(f'{year_range[0]}-{year_range[1]}_per_game.json', 'w') as f:
-        json.dump(data, f)
+            start_year += 1
+            sleep(3)
+
+        with open(f'{file_start}-{end_year}_per_game_{fileNameEnd}.json', 'w') as f:
+            json.dump(data, f)
+        return
+
+    if reg_play == "Both":
+        cntr = 0
+        nameEnd = 'regular_season'
+        while cntr < 2:
+            actual_scrape(start_year, end_year, page_list[cntr], nameEnd)
+            # since the second list will always be a list with playoffs, we can do this
+            nameEnd = 'playoffs'
+            cntr += 1
+    elif reg_play == "Regular Season":
+        actual_scrape(start_year, end_year, page_list, 'regular_season')
+    elif reg_play == "Playoffs":
+        actual_scrape(start_year, end_year, page_list, 'playoffs')
     return
 
 
-def advanced_scrape(start_year, page_list):
-    data = []
+def advanced_scrape(reg_play, start_year, end_year):
+    tp = "adv"
+    page_list = list_creator(reg_play, start_year, end_year, tp)
 
-    for page in page_list:
-        r = requests.get(page)
-        soup = BeautifulSoup(r.content, 'html.parser')
-        rows = soup.select('tbody tr')
+    def actual_scrape(start_year, end_year, page_list, fileNameEnd):
+        data = []
+        file_start = start_year  # did this for the file name
+        for page in page_list:
+            r = requests.get(page)
+            soup = BeautifulSoup(r.content, 'html.parser')
+            rows = soup.select('tbody tr')
 
-        for row in rows:
-            d = dict()
-            # The initial scraping threw back some errors due to the initial structure of the HTML
-            if row.select_one('[data-stat=g]').text.strip() != 'G':
-                d['Year'] = start_year
-                d['Name'] = row.select_one('[data-stat=player]').text.strip()
-                d['Position'] = row.select_one('[data-stat=pos]').text.strip()
-                d['Age'] = row.select_one('[data-stat=age]').text.strip()
-                d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
-                d['Games_Played'] = float(
-                    row.select_one('[data-stat=g]').text.strip())
-                d['Minutes_Played'] = float(
-                    row.select_one('[data-stat=mp]').text.strip())
-                # Some fields gave back empty strings, this is to combat those fields and will be repeated often
-                if row.select_one('[data-stat=per]').text.strip() == "":
-                    d['PER'] = float(0)
-                else:
-                    d['PER'] = float(row.select_one(
-                        '[data-stat=per]').text.strip())
+            for row in rows:
+                d = dict()
+                # The initial scraping threw back some errors due to the initial structure of the HTML
+                if row.select_one('[data-stat=g]').text.strip() != 'G':
+                    d['Year'] = start_year
+                    d['Name'] = row.select_one(
+                        '[data-stat=player]').text.strip()
+                    d['Position'] = row.select_one(
+                        '[data-stat=pos]').text.strip()
+                    d['Age'] = row.select_one('[data-stat=age]').text.strip()
+                    d['Team'] = row.select_one(
+                        '[data-stat=team_id]').text.strip()
+                    d['Games_Played'] = float(
+                        row.select_one('[data-stat=g]').text.strip())
+                    d['Minutes_Played'] = float(
+                        row.select_one('[data-stat=mp]').text.strip())
+                    # Some fields gave back empty strings, this is to combat those fields and will be repeated often
+                    if row.select_one('[data-stat=per]').text.strip() == "":
+                        d['PER'] = float(0)
+                    else:
+                        d['PER'] = float(row.select_one(
+                            '[data-stat=per]').text.strip())
 
-                if row.select_one('[data-stat=ts_pct]').text.strip() == "":
-                    d['TS_Percentage'] = float(0)
-                else:
-                    d['TS_Percentage'] = float(row.select_one(
-                        '[data-stat=ts_pct]').text.strip())
+                    if row.select_one('[data-stat=ts_pct]').text.strip() == "":
+                        d['TS_Percentage'] = float(0)
+                    else:
+                        d['TS_Percentage'] = float(row.select_one(
+                            '[data-stat=ts_pct]').text.strip())
 
-                if row.select_one('[data-stat=fg3a_per_fga_pct]').text.strip() == "":
-                    d['3PAr'] = float(0)
-                else:
-                    d['3PAr'] = float(row.select_one(
-                        '[data-stat=fg3a_per_fga_pct]').text.strip())
+                    if row.select_one('[data-stat=fg3a_per_fga_pct]').text.strip() == "":
+                        d['3PAr'] = float(0)
+                    else:
+                        d['3PAr'] = float(row.select_one(
+                            '[data-stat=fg3a_per_fga_pct]').text.strip())
 
-                if row.select_one('[data-stat=fta_per_fga_pct]').text.strip() == "":
-                    d['FTr'] = float(0)
-                else:
-                    d['FTr'] = float(row.select_one(
-                        '[data-stat=fta_per_fga_pct]').text.strip())
+                    if row.select_one('[data-stat=fta_per_fga_pct]').text.strip() == "":
+                        d['FTr'] = float(0)
+                    else:
+                        d['FTr'] = float(row.select_one(
+                            '[data-stat=fta_per_fga_pct]').text.strip())
 
-                if row.select_one('[data-stat=orb_pct]').text.strip() == "":
-                    d['ORB_Percentage'] = float(0)
-                else:
-                    d['ORB_Percentage'] = float(row.select_one(
-                        '[data-stat=orb_pct]').text.strip())
+                    if row.select_one('[data-stat=orb_pct]').text.strip() == "":
+                        d['ORB_Percentage'] = float(0)
+                    else:
+                        d['ORB_Percentage'] = float(row.select_one(
+                            '[data-stat=orb_pct]').text.strip())
 
-                if row.select_one('[data-stat=drb_pct]').text.strip() == "":
-                    d['DRB_Percentage'] = float(0)
-                else:
-                    d['DRB_Percentage'] = float(row.select_one(
-                        '[data-stat=drb_pct]').text.strip())
+                    if row.select_one('[data-stat=drb_pct]').text.strip() == "":
+                        d['DRB_Percentage'] = float(0)
+                    else:
+                        d['DRB_Percentage'] = float(row.select_one(
+                            '[data-stat=drb_pct]').text.strip())
 
-                if row.select_one('[data-stat=trb_pct]').text.strip() == "":
-                    d['TRB_Percentage'] = float(0)
-                else:
-                    d['TRB_Percentage'] = float(row.select_one(
-                        '[data-stat=trb_pct]').text.strip())
+                    if row.select_one('[data-stat=trb_pct]').text.strip() == "":
+                        d['TRB_Percentage'] = float(0)
+                    else:
+                        d['TRB_Percentage'] = float(row.select_one(
+                            '[data-stat=trb_pct]').text.strip())
 
-                if row.select_one('[data-stat=ast_pct]').text.strip() == "":
-                    d['AST_Percentage'] = float(0)
-                else:
-                    d['AST_Percentage'] = float(row.select_one(
-                        '[data-stat=ast_pct]').text.strip())
+                    if row.select_one('[data-stat=ast_pct]').text.strip() == "":
+                        d['AST_Percentage'] = float(0)
+                    else:
+                        d['AST_Percentage'] = float(row.select_one(
+                            '[data-stat=ast_pct]').text.strip())
 
-                if row.select_one('[data-stat=stl_pct]').text.strip() == "":
-                    d['STL_Percentage'] = float(0)
-                else:
-                    d['STL_Percentage'] = float(row.select_one(
-                        '[data-stat=stl_pct]').text.strip())
+                    if row.select_one('[data-stat=stl_pct]').text.strip() == "":
+                        d['STL_Percentage'] = float(0)
+                    else:
+                        d['STL_Percentage'] = float(row.select_one(
+                            '[data-stat=stl_pct]').text.strip())
 
-                if row.select_one('[data-stat=blk_pct]').text.strip() == "":
-                    d['BLK_Percentage'] = float(0)
-                else:
-                    d['BLK_Percentage'] = float(row.select_one(
-                        '[data-stat=blk_pct]').text.strip())
+                    if row.select_one('[data-stat=blk_pct]').text.strip() == "":
+                        d['BLK_Percentage'] = float(0)
+                    else:
+                        d['BLK_Percentage'] = float(row.select_one(
+                            '[data-stat=blk_pct]').text.strip())
 
-                if row.select_one('[data-stat=tov_pct]').text.strip() == "":
-                    d['TOV_Percentage'] = float(0)
-                else:
-                    d['TOV_Percentage'] = float(row.select_one(
-                        '[data-stat=tov_pct]').text.strip())
+                    if row.select_one('[data-stat=tov_pct]').text.strip() == "":
+                        d['TOV_Percentage'] = float(0)
+                    else:
+                        d['TOV_Percentage'] = float(row.select_one(
+                            '[data-stat=tov_pct]').text.strip())
 
-                if row.select_one('[data-stat=usg_pct]').text.strip() == "":
-                    d['USG_Percentage'] = float(0)
-                else:
-                    d['USG_Percentage'] = float(row.select_one(
-                        '[data-stat=usg_pct]').text.strip())
+                    if row.select_one('[data-stat=usg_pct]').text.strip() == "":
+                        d['USG_Percentage'] = float(0)
+                    else:
+                        d['USG_Percentage'] = float(row.select_one(
+                            '[data-stat=usg_pct]').text.strip())
 
-                d['OWS'] = float(row.select_one(
-                    '[data-stat=ows]').text.strip())
-                d['DWS'] = float(row.select_one(
-                    '[data-stat=dws]').text.strip())
-                d['WS'] = float(row.select_one('[data-stat=ws]').text.strip())
-                d['OBPM'] = float(row.select_one(
-                    '[data-stat=obpm]').text.strip())
-                d['DBPM'] = float(row.select_one(
-                    '[data-stat=dbpm]').text.strip())
-                d['BPM'] = float(row.select_one(
-                    '[data-stat=bpm]').text.strip())
-                d['VORP'] = float(row.select_one(
-                    '[data-stat=vorp]').text.strip())
+                    d['OWS'] = float(row.select_one(
+                        '[data-stat=ows]').text.strip())
+                    d['DWS'] = float(row.select_one(
+                        '[data-stat=dws]').text.strip())
+                    d['WS'] = float(row.select_one(
+                        '[data-stat=ws]').text.strip())
+                    d['OBPM'] = float(row.select_one(
+                        '[data-stat=obpm]').text.strip())
+                    d['DBPM'] = float(row.select_one(
+                        '[data-stat=dbpm]').text.strip())
+                    d['BPM'] = float(row.select_one(
+                        '[data-stat=bpm]').text.strip())
+                    d['VORP'] = float(row.select_one(
+                        '[data-stat=vorp]').text.strip())
 
-                data.append(d)
+                    data.append(d)
 
-        start_year += 1
-        sleep(3)
+            start_year += 1
+            sleep(3)
 
-    with open(f'{year_range[0]}-{year_range[1]}_advanced_stats.json', 'w') as f:
-        json.dump(data, f)
+        with open(f'{file_start}-{end_year}_advanced_stats_{fileNameEnd}.json', 'w') as f:
+            json.dump(data, f)
+        return
+
+    if reg_play == "Both":
+        cntr = 0
+        nameEnd = 'regular_season'
+        while cntr < 2:
+            actual_scrape(start_year, end_year, page_list[cntr], nameEnd)
+            # since the second list will always be a list with playoffs, we can do this
+            nameEnd = 'playoffs'
+            cntr += 1
+    elif reg_play == "Regular Season":
+        actual_scrape(start_year, end_year, page_list, 'regular_season')
+    elif reg_play == "Playoffs":
+        actual_scrape(start_year, end_year, page_list, 'playoffs')
     return
 
 
-def per_36_scrape(start_year, page_list):
-    data = []
+def per_36_scrape(reg_play, start_year, end_year):
+    tp = "per36"
+    page_list = list_creator(reg_play, start_year, end_year, tp)
 
-    for page in page_list:
-        r = requests.get(page)
-        soup = BeautifulSoup(r.content, 'html.parser')
-        rows = soup.select('tbody tr')
+    def actual_scrape(start_year, end_year, page_list, fileNameEnd):
+        data = []
+        file_start = start_year  # did this for the file name
+        for page in page_list:
+            r = requests.get(page)
+            soup = BeautifulSoup(r.content, 'html.parser')
+            rows = soup.select('tbody tr')
 
-        for row in rows:
-            d = dict()
+            for row in rows:
+                d = dict()
 
-            if row.select_one('[data-stat=g]').text.strip() != 'G':
-                d['Year'] = start_year
-                d['Name'] = row.select_one('[data-stat=player]').text.strip()
-                d['Position'] = row.select_one('[data-stat=pos]').text.strip()
-                d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
-                d['Age'] = row.select_one('[data-stat=age]').text.strip()
-                d['Games_Played'] = float(
-                    row.select_one('[data-stat=g]').text.strip())
-                d['Games_Started'] = float(
-                    row.select_one('[data-stat=gs]').text.strip())
-                d['Minutes_Played'] = float(
-                    row.select_one('[data-stat=mp]').text.strip())
+                if row.select_one('[data-stat=g]').text.strip() != 'G':
+                    d['Year'] = start_year
+                    d['Name'] = row.select_one(
+                        '[data-stat=player]').text.strip()
+                    d['Position'] = row.select_one(
+                        '[data-stat=pos]').text.strip()
+                    d['Team'] = row.select_one(
+                        '[data-stat=team_id]').text.strip()
+                    d['Age'] = row.select_one('[data-stat=age]').text.strip()
+                    d['Games_Played'] = float(
+                        row.select_one('[data-stat=g]').text.strip())
+                    d['Games_Started'] = float(
+                        row.select_one('[data-stat=gs]').text.strip())
+                    d['Minutes_Played'] = float(
+                        row.select_one('[data-stat=mp]').text.strip())
 
-                if row.select_one('[data-stat=fg_per_mp]').text.strip() == "":
-                    d['FGM_Per_36'] = float(0)
-                else:
-                    d['FGM_Per_36'] = float(row.select_one(
-                        '[data-stat=fg_per_mp]').text.strip())
+                    if row.select_one('[data-stat=fg_per_mp]').text.strip() == "":
+                        d['FGM_Per_36'] = float(0)
+                    else:
+                        d['FGM_Per_36'] = float(row.select_one(
+                            '[data-stat=fg_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=fga_per_mp]').text.strip() == "":
-                    d['FGA_Per_36'] = float(0)
-                else:
-                    d['FGA_Per_36'] = float(row.select_one(
-                        '[data-stat=fga_per_mp]').text.strip())
+                    if row.select_one('[data-stat=fga_per_mp]').text.strip() == "":
+                        d['FGA_Per_36'] = float(0)
+                    else:
+                        d['FGA_Per_36'] = float(row.select_one(
+                            '[data-stat=fga_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=fg_pct]').text.strip() == "":
-                    d['FG_PCT'] = float(0)
-                else:
-                    d['FG_PCT'] = float(row.select_one(
-                        '[data-stat=fg_pct]').text.strip())
+                    if row.select_one('[data-stat=fg_pct]').text.strip() == "":
+                        d['FG_PCT'] = float(0)
+                    else:
+                        d['FG_PCT'] = float(row.select_one(
+                            '[data-stat=fg_pct]').text.strip())
 
-                if row.select_one('[data-stat=fg3_per_mp]').text.strip() == "":
-                    d['3PM_Per_36'] = float(0)
-                else:
-                    d['3PM_Per_36'] = float(row.select_one(
-                        '[data-stat=fg3_per_mp]').text.strip())
+                    if row.select_one('[data-stat=fg3_per_mp]').text.strip() == "":
+                        d['3PM_Per_36'] = float(0)
+                    else:
+                        d['3PM_Per_36'] = float(row.select_one(
+                            '[data-stat=fg3_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=fg3a_per_mp]').text.strip() == "":
-                    d['3PA_Per_36'] = float(0)
-                else:
-                    d['3PA_Per_36'] = float(row.select_one(
-                        '[data-stat=fg3a_per_mp]').text.strip())
+                    if row.select_one('[data-stat=fg3a_per_mp]').text.strip() == "":
+                        d['3PA_Per_36'] = float(0)
+                    else:
+                        d['3PA_Per_36'] = float(row.select_one(
+                            '[data-stat=fg3a_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
-                    d['3P_PCT'] = float(0)
-                else:
-                    d['3P_PCT'] = float(row.select_one(
-                        '[data-stat=fg3_pct]').text.strip())
+                    if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
+                        d['3P_PCT'] = float(0)
+                    else:
+                        d['3P_PCT'] = float(row.select_one(
+                            '[data-stat=fg3_pct]').text.strip())
 
-                if row.select_one('[data-stat=fg2_per_mp]').text.strip() == "":
-                    d['2PM_Per_36'] = float(0)
-                else:
-                    d['2PM_Per_36'] = float(row.select_one(
-                        '[data-stat=fg2_per_mp]').text.strip())
+                    if row.select_one('[data-stat=fg2_per_mp]').text.strip() == "":
+                        d['2PM_Per_36'] = float(0)
+                    else:
+                        d['2PM_Per_36'] = float(row.select_one(
+                            '[data-stat=fg2_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=fg2a_per_mp]').text.strip() == "":
-                    d['2PA_Per_36'] = float(0)
-                else:
-                    d['2PA_Per_36'] = float(row.select_one(
-                        '[data-stat=fg2a_per_mp]').text.strip())
+                    if row.select_one('[data-stat=fg2a_per_mp]').text.strip() == "":
+                        d['2PA_Per_36'] = float(0)
+                    else:
+                        d['2PA_Per_36'] = float(row.select_one(
+                            '[data-stat=fg2a_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
-                    d['2P_PCT'] = float(0)
-                else:
-                    d['2P_PCT'] = float(row.select_one(
-                        '[data-stat=fg2_pct]').text.strip())
+                    if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
+                        d['2P_PCT'] = float(0)
+                    else:
+                        d['2P_PCT'] = float(row.select_one(
+                            '[data-stat=fg2_pct]').text.strip())
 
-                if row.select_one('[data-stat=ft_per_mp]').text.strip() == "":
-                    d['FTM_Per_36'] = float(0)
-                else:
-                    d['FTM_Per_36'] = float(row.select_one(
-                        '[data-stat=ft_per_mp]').text.strip())
+                    if row.select_one('[data-stat=ft_per_mp]').text.strip() == "":
+                        d['FTM_Per_36'] = float(0)
+                    else:
+                        d['FTM_Per_36'] = float(row.select_one(
+                            '[data-stat=ft_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=fta_per_mp]').text.strip() == "":
-                    d['FTA_Per_36'] = float(0)
-                else:
-                    d['FTA_Per_36'] = float(row.select_one(
-                        '[data-stat=fta_per_mp]').text.strip())
+                    if row.select_one('[data-stat=fta_per_mp]').text.strip() == "":
+                        d['FTA_Per_36'] = float(0)
+                    else:
+                        d['FTA_Per_36'] = float(row.select_one(
+                            '[data-stat=fta_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=ft_pct]').text.strip() == "":
-                    d['FT_PCT'] = float(0)
-                else:
-                    d['FT_PCT'] = float(row.select_one(
-                        '[data-stat=ft_pct]').text.strip())
+                    if row.select_one('[data-stat=ft_pct]').text.strip() == "":
+                        d['FT_PCT'] = float(0)
+                    else:
+                        d['FT_PCT'] = float(row.select_one(
+                            '[data-stat=ft_pct]').text.strip())
 
-                if row.select_one('[data-stat=drb_per_mp]').text.strip() == "":
-                    d['DRB_Per_36'] = float(0)
-                else:
-                    d['DRB_Per_36'] = float(row.select_one(
-                        '[data-stat=drb_per_mp]').text.strip())
+                    if row.select_one('[data-stat=drb_per_mp]').text.strip() == "":
+                        d['DRB_Per_36'] = float(0)
+                    else:
+                        d['DRB_Per_36'] = float(row.select_one(
+                            '[data-stat=drb_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=orb_per_mp]').text.strip() == "":
-                    d['ORB_Per_36'] = float(0)
-                else:
-                    d['ORB_Per_36'] = float(row.select_one(
-                        '[data-stat=orb_per_mp]').text.strip())
+                    if row.select_one('[data-stat=orb_per_mp]').text.strip() == "":
+                        d['ORB_Per_36'] = float(0)
+                    else:
+                        d['ORB_Per_36'] = float(row.select_one(
+                            '[data-stat=orb_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=trb_per_mp]').text.strip() == "":
-                    d['TRB_Per_36'] = float(0)
-                else:
-                    d['TRB_Per_36'] = float(row.select_one(
-                        '[data-stat=trb_per_mp]').text.strip())
+                    if row.select_one('[data-stat=trb_per_mp]').text.strip() == "":
+                        d['TRB_Per_36'] = float(0)
+                    else:
+                        d['TRB_Per_36'] = float(row.select_one(
+                            '[data-stat=trb_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=ast_per_mp]').text.strip() == "":
-                    d['AST_Per_36'] = float(0)
-                else:
-                    d['AST_Per_36'] = float(row.select_one(
-                        '[data-stat=ast_per_mp]').text.strip())
+                    if row.select_one('[data-stat=ast_per_mp]').text.strip() == "":
+                        d['AST_Per_36'] = float(0)
+                    else:
+                        d['AST_Per_36'] = float(row.select_one(
+                            '[data-stat=ast_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=stl_per_mp]').text.strip() == "":
-                    d['STL_Per_36'] = float(0)
-                else:
-                    d['STL_Per_36'] = float(row.select_one(
-                        '[data-stat=stl_per_mp]').text.strip())
+                    if row.select_one('[data-stat=stl_per_mp]').text.strip() == "":
+                        d['STL_Per_36'] = float(0)
+                    else:
+                        d['STL_Per_36'] = float(row.select_one(
+                            '[data-stat=stl_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=blk_per_mp]').text.strip() == "":
-                    d['BLK_Per_36'] = float(0)
-                else:
-                    d['BLK_Per_36'] = float(row.select_one(
-                        '[data-stat=blk_per_mp]').text.strip())
+                    if row.select_one('[data-stat=blk_per_mp]').text.strip() == "":
+                        d['BLK_Per_36'] = float(0)
+                    else:
+                        d['BLK_Per_36'] = float(row.select_one(
+                            '[data-stat=blk_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=tov_per_mp]').text.strip() == "":
-                    d['TOV_Per_36'] = float(0)
-                else:
-                    d['TOV_Per_36'] = float(row.select_one(
-                        '[data-stat=tov_per_mp]').text.strip())
+                    if row.select_one('[data-stat=tov_per_mp]').text.strip() == "":
+                        d['TOV_Per_36'] = float(0)
+                    else:
+                        d['TOV_Per_36'] = float(row.select_one(
+                            '[data-stat=tov_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=pf_per_mp]').text.strip() == "":
-                    d['Fouls_Per_36'] = float(0)
-                else:
-                    d['Fouls_Per_36'] = float(row.select_one(
-                        '[data-stat=pf_per_mp]').text.strip())
+                    if row.select_one('[data-stat=pf_per_mp]').text.strip() == "":
+                        d['Fouls_Per_36'] = float(0)
+                    else:
+                        d['Fouls_Per_36'] = float(row.select_one(
+                            '[data-stat=pf_per_mp]').text.strip())
 
-                if row.select_one('[data-stat=pts_per_mp]').text.strip() == "":
-                    d['Points_Per_36'] = float(0)
-                else:
-                    d['Points_Per_36'] = float(row.select_one(
-                        '[data-stat=pts_per_mp]').text.strip())
+                    if row.select_one('[data-stat=pts_per_mp]').text.strip() == "":
+                        d['Points_Per_36'] = float(0)
+                    else:
+                        d['Points_Per_36'] = float(row.select_one(
+                            '[data-stat=pts_per_mp]').text.strip())
 
-                data.append(d)
+                    data.append(d)
 
-        start_year += 1
-        sleep(3)
+            start_year += 1
+            sleep(3)
 
-    with open(f'{year_range[0]}-{year_range[1]}_per_36.json', 'w') as f:
-        json.dump(data, f)
+        with open(f'{file_start}-{end_year}_per_36_{fileNameEnd}.json', 'w') as f:
+            json.dump(data, f)
+        return
+
+    if reg_play == "Both":
+        cntr = 0
+        nameEnd = 'regular_season'
+        while cntr < 2:
+            actual_scrape(start_year, end_year, page_list[cntr], nameEnd)
+            # since the second list will always be a list with playoffs, we can do this
+            nameEnd = 'playoffs'
+            cntr += 1
+    elif reg_play == "Regular Season":
+        actual_scrape(start_year, end_year, page_list, 'regular_season')
+    elif reg_play == "Playoffs":
+        actual_scrape(start_year, end_year, page_list, 'playoffs')
+
+    return
 
 
 def per_100_scrape(start_year, page_list):
-    data = []
+    tp = "per100"
+    page_list = list_creator(reg_play, start_year, end_year, tp)
 
-    for page in page_list:
-        r = requests.get(page)
-        soup = BeautifulSoup(r.content, 'html.parser')
-        rows = soup.select('tbody tr')
+    def actual_scrape(start_year, end_year, page_list, fileNameEnd):
+        data = []
+        file_start = start_year  # did this for the file name
+        for page in page_list:
+            r = requests.get(page)
+            soup = BeautifulSoup(r.content, 'html.parser')
+            rows = soup.select('tbody tr')
 
-        for row in rows:
-            d = dict()
+            for row in rows:
+                d = dict()
 
-            if row.select_one('[data-stat=g]').text.strip() != 'G':
-                d['Year'] = start_year
-                d['Name'] = row.select_one('[data-stat=player]').text.strip()
-                d['Position'] = row.select_one('[data-stat=pos]').text.strip()
-                d['Age'] = row.select_one('[data-stat=age]').text.strip()
-                d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
-                d['Games_Played'] = float(
-                    row.select_one('[data-stat=g]').text.strip())
-                d['Games_Started'] = float(
-                    row.select_one('[data-stat=gs]').text.strip())
-                d['Minutes_Played'] = float(
-                    row.select_one('[data-stat=mp]').text.strip())
+                if row.select_one('[data-stat=g]').text.strip() != 'G':
+                    d['Year'] = start_year
+                    d['Name'] = row.select_one(
+                        '[data-stat=player]').text.strip()
+                    d['Position'] = row.select_one(
+                        '[data-stat=pos]').text.strip()
+                    d['Age'] = row.select_one('[data-stat=age]').text.strip()
+                    d['Team'] = row.select_one(
+                        '[data-stat=team_id]').text.strip()
+                    d['Games_Played'] = float(
+                        row.select_one('[data-stat=g]').text.strip())
+                    d['Games_Started'] = float(
+                        row.select_one('[data-stat=gs]').text.strip())
+                    d['Minutes_Played'] = float(
+                        row.select_one('[data-stat=mp]').text.strip())
 
-                if row.select_one('[data-stat=fg_per_poss]').text.strip() == "":
-                    d['FGM_Per_100_Posessions'] = float(0)
-                else:
-                    d['FGM_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=fg_per_poss]').text.strip())
+                    if row.select_one('[data-stat=fg_per_poss]').text.strip() == "":
+                        d['FGM_Per_100_Posessions'] = float(0)
+                    else:
+                        d['FGM_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=fg_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=fga_per_poss]').text.strip() == "":
-                    d['FGA_Per_100_Posessions'] = float(0)
-                else:
-                    d['FGA_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=fga_per_poss]').text.strip())
+                    if row.select_one('[data-stat=fga_per_poss]').text.strip() == "":
+                        d['FGA_Per_100_Posessions'] = float(0)
+                    else:
+                        d['FGA_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=fga_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=fg_pct]').text.strip() == "":
-                    d['FG_PCT'] = float(0)
-                else:
-                    d['FG_PCT'] = float(row.select_one(
-                        '[data-stat=fg_pct]').text.strip())
+                    if row.select_one('[data-stat=fg_pct]').text.strip() == "":
+                        d['FG_PCT'] = float(0)
+                    else:
+                        d['FG_PCT'] = float(row.select_one(
+                            '[data-stat=fg_pct]').text.strip())
 
-                if row.select_one('[data-stat=fg3_per_poss]').text.strip() == "":
-                    d['3PM_Per_100_Posessions'] = float(0)
-                else:
-                    d['3PM_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=fg3_per_poss]').text.strip())
+                    if row.select_one('[data-stat=fg3_per_poss]').text.strip() == "":
+                        d['3PM_Per_100_Posessions'] = float(0)
+                    else:
+                        d['3PM_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=fg3_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=fg3a_per_poss]').text.strip() == "":
-                    d['3PA_Per_100_Posessions'] = float(0)
-                else:
-                    d['3PA_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=fg3a_per_poss]').text.strip())
+                    if row.select_one('[data-stat=fg3a_per_poss]').text.strip() == "":
+                        d['3PA_Per_100_Posessions'] = float(0)
+                    else:
+                        d['3PA_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=fg3a_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
-                    d['3P_PCT'] = float(0)
-                else:
-                    d['3P_PCT'] = float(row.select_one(
-                        '[data-stat=fg3_pct]').text.strip())
+                    if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
+                        d['3P_PCT'] = float(0)
+                    else:
+                        d['3P_PCT'] = float(row.select_one(
+                            '[data-stat=fg3_pct]').text.strip())
 
-                if row.select_one('[data-stat=fg2_per_poss]').text.strip() == "":
-                    d['2PM_Per_100_Posessions'] = float(0)
-                else:
-                    d['2PM_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=fg2_per_poss]').text.strip())
+                    if row.select_one('[data-stat=fg2_per_poss]').text.strip() == "":
+                        d['2PM_Per_100_Posessions'] = float(0)
+                    else:
+                        d['2PM_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=fg2_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=fg2a_per_poss]').text.strip() == "":
-                    d['2PA_Per_100_Posessions'] = float(0)
-                else:
-                    d['2PA_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=fg2a_per_poss]').text.strip())
+                    if row.select_one('[data-stat=fg2a_per_poss]').text.strip() == "":
+                        d['2PA_Per_100_Posessions'] = float(0)
+                    else:
+                        d['2PA_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=fg2a_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
-                    d['2P_PCT'] = float(0)
-                else:
-                    d['2P_PCT'] = float(row.select_one(
-                        '[data-stat=fg2_pct]').text.strip())
+                    if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
+                        d['2P_PCT'] = float(0)
+                    else:
+                        d['2P_PCT'] = float(row.select_one(
+                            '[data-stat=fg2_pct]').text.strip())
 
-                if row.select_one('[data-stat=ft_per_poss]').text.strip() == "":
-                    d['FTM_Per_100_Posessions'] = float(0)
-                else:
-                    d['FTM_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=ft_per_poss]').text.strip())
+                    if row.select_one('[data-stat=ft_per_poss]').text.strip() == "":
+                        d['FTM_Per_100_Posessions'] = float(0)
+                    else:
+                        d['FTM_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=ft_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=fta_per_poss]').text.strip() == "":
-                    d['FTA_Per_100_Posessions'] = float(0)
-                else:
-                    d['FTA_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=fta_per_poss]').text.strip())
+                    if row.select_one('[data-stat=fta_per_poss]').text.strip() == "":
+                        d['FTA_Per_100_Posessions'] = float(0)
+                    else:
+                        d['FTA_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=fta_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=ft_pct]').text.strip() == "":
-                    d['FT_PCT'] = float(0)
-                else:
-                    d['FT_PCT'] = float(row.select_one(
-                        '[data-stat=ft_pct]').text.strip())
+                    if row.select_one('[data-stat=ft_pct]').text.strip() == "":
+                        d['FT_PCT'] = float(0)
+                    else:
+                        d['FT_PCT'] = float(row.select_one(
+                            '[data-stat=ft_pct]').text.strip())
 
-                if row.select_one('[data-stat=drb_per_poss]').text.strip() == "":
-                    d['DRB_Per_100_Posessions'] = float(0)
-                else:
-                    d['DRB_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=drb_per_poss]').text.strip())
+                    if row.select_one('[data-stat=drb_per_poss]').text.strip() == "":
+                        d['DRB_Per_100_Posessions'] = float(0)
+                    else:
+                        d['DRB_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=drb_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=orb_per_poss]').text.strip() == "":
-                    d['ORB_Per_100_Posessions'] = float(0)
-                else:
-                    d['ORB_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=orb_per_poss]').text.strip())
+                    if row.select_one('[data-stat=orb_per_poss]').text.strip() == "":
+                        d['ORB_Per_100_Posessions'] = float(0)
+                    else:
+                        d['ORB_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=orb_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=trb_per_poss]').text.strip() == "":
-                    d['TRB_Per_100_Posessions'] = float(0)
-                else:
-                    d['TRB_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=trb_per_poss]').text.strip())
+                    if row.select_one('[data-stat=trb_per_poss]').text.strip() == "":
+                        d['TRB_Per_100_Posessions'] = float(0)
+                    else:
+                        d['TRB_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=trb_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=ast_per_poss]').text.strip() == "":
-                    d['AST_Per_100_Posessions'] = float(0)
-                else:
-                    d['AST_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=ast_per_poss]').text.strip())
+                    if row.select_one('[data-stat=ast_per_poss]').text.strip() == "":
+                        d['AST_Per_100_Posessions'] = float(0)
+                    else:
+                        d['AST_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=ast_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=stl_per_poss]').text.strip() == "":
-                    d['STL_Per_100_Posessions'] = float(0)
-                else:
-                    d['STL_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=stl_per_poss]').text.strip())
+                    if row.select_one('[data-stat=stl_per_poss]').text.strip() == "":
+                        d['STL_Per_100_Posessions'] = float(0)
+                    else:
+                        d['STL_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=stl_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=blk_per_poss]').text.strip() == "":
-                    d['BLK_Per_100_Posessions'] = float(0)
-                else:
-                    d['BLK_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=blk_per_poss]').text.strip())
+                    if row.select_one('[data-stat=blk_per_poss]').text.strip() == "":
+                        d['BLK_Per_100_Posessions'] = float(0)
+                    else:
+                        d['BLK_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=blk_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=tov_per_poss]').text.strip() == "":
-                    d['TOV_Per_100_Posessions'] = float(0)
-                else:
-                    d['TOV_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=tov_per_poss]').text.strip())
+                    if row.select_one('[data-stat=tov_per_poss]').text.strip() == "":
+                        d['TOV_Per_100_Posessions'] = float(0)
+                    else:
+                        d['TOV_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=tov_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=pf_per_poss]').text.strip() == "":
-                    d['Fouls_Per_100_Posessions'] = float(0)
-                else:
-                    d['Fouls_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=pf_per_poss]').text.strip())
+                    if row.select_one('[data-stat=pf_per_poss]').text.strip() == "":
+                        d['Fouls_Per_100_Posessions'] = float(0)
+                    else:
+                        d['Fouls_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=pf_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=pts_per_poss]').text.strip() == "":
-                    d['Points_Per_100_Posessions'] = float(0)
-                else:
-                    d['Points_Per_100_Posessions'] = float(row.select_one(
-                        '[data-stat=pts_per_poss]').text.strip())
+                    if row.select_one('[data-stat=pts_per_poss]').text.strip() == "":
+                        d['Points_Per_100_Posessions'] = float(0)
+                    else:
+                        d['Points_Per_100_Posessions'] = float(row.select_one(
+                            '[data-stat=pts_per_poss]').text.strip())
 
-                if row.select_one('[data-stat=off_rtg]').text.strip() == "":
-                    d['Offensive_Rating'] = float(0)
-                else:
-                    d['Offensive_Rating'] = float(
-                        row.select_one('[data-stat=off_rtg]').text.strip())
+                    if row.select_one('[data-stat=off_rtg]').text.strip() == "":
+                        d['Offensive_Rating'] = float(0)
+                    else:
+                        d['Offensive_Rating'] = float(
+                            row.select_one('[data-stat=off_rtg]').text.strip())
 
-                if row.select_one('[data-stat=def_rtg]').text.strip() == "":
-                    d['Defensive_Rating'] = float(0)
-                else:
-                    d['Defensive_Rating'] = float(row.select_one(
-                        '[data-stat=def_rtg]').text.strip())
+                    if row.select_one('[data-stat=def_rtg]').text.strip() == "":
+                        d['Defensive_Rating'] = float(0)
+                    else:
+                        d['Defensive_Rating'] = float(row.select_one(
+                            '[data-stat=def_rtg]').text.strip())
 
-                data.append(d)
+                    data.append(d)
 
-        start_year += 1
-        sleep(3)
+            start_year += 1
+            sleep(3)
 
-    with open(f'{year_range[0]}-{year_range[1]}_per_100_possessions.json', 'w') as f:
-        json.dump(data, f)
+        with open(f'{file_start}-{end_year}_per_100_possessions_{fileNameEnd}.json', 'w') as f:
+            json.dump(data, f)
+        return
+
+    if reg_play == "Both":
+        cntr = 0
+        nameEnd = 'regular_season'
+        while cntr < 2:
+            actual_scrape(start_year, end_year, page_list[cntr], nameEnd)
+            # since the second list will always be a list with playoffs, we can do this
+            nameEnd = 'playoffs'
+            cntr += 1
+    elif reg_play == "Regular Season":
+        actual_scrape(start_year, end_year, page_list, 'regular_season')
+    elif reg_play == "Playoffs":
+        actual_scrape(start_year, end_year, page_list, 'playoffs')
     return
 
 
 def totals_scrape(start_year, page_list):
-    data = []
+    tp = "totals"
+    page_list = list_creator(reg_play, start_year, end_year, tp)
 
-    for page in page_list:
-        r = requests.get(page)
-        soup = BeautifulSoup(r.content, 'html.parser')
-        rows = soup.select('tbody tr')
+    def actual_scrape(start_year, end_year, page_list, fileNameEnd):
+        data = []
+        file_start = start_year  # did this for the file name
+        for page in page_list:
+            r = requests.get(page)
+            soup = BeautifulSoup(r.content, 'html.parser')
+            rows = soup.select('tbody tr')
 
-        for row in rows:
-            d = dict()
+            for row in rows:
+                d = dict()
 
-            if row.select_one('[data-stat=g]').text.strip() != 'G':
-                d['Year'] = start_year
-                d['Name'] = row.select_one('[data-stat=player]').text.strip()
-                d['Position'] = row.select_one('[data-stat=pos]').text.strip()
-                d['Age'] = row.select_one('[data-stat=age]').text.strip()
-                d['Team'] = row.select_one('[data-stat=team_id]').text.strip()
-                d['Games_Played'] = float(
-                    row.select_one('[data-stat=g]').text.strip())
-                d['Games_Started'] = float(
-                    row.select_one('[data-stat=gs]').text.strip())
-                d['Minutes_Played'] = float(
-                    row.select_one('[data-stat=mp]').text.strip())
-                d['FGM_Total'] = float(row.select_one(
-                    '[data-stat=fg]').text.strip())
-                d['FGA_Total'] = float(row.select_one(
-                    '[data-stat=fga]').text.strip())
+                if row.select_one('[data-stat=g]').text.strip() != 'G':
+                    d['Year'] = start_year
+                    d['Name'] = row.select_one(
+                        '[data-stat=player]').text.strip()
+                    d['Position'] = row.select_one(
+                        '[data-stat=pos]').text.strip()
+                    d['Age'] = row.select_one('[data-stat=age]').text.strip()
+                    d['Team'] = row.select_one(
+                        '[data-stat=team_id]').text.strip()
+                    d['Games_Played'] = float(
+                        row.select_one('[data-stat=g]').text.strip())
+                    d['Games_Started'] = float(
+                        row.select_one('[data-stat=gs]').text.strip())
+                    d['Minutes_Played'] = float(
+                        row.select_one('[data-stat=mp]').text.strip())
+                    d['FGM_Total'] = float(row.select_one(
+                        '[data-stat=fg]').text.strip())
+                    d['FGA_Total'] = float(row.select_one(
+                        '[data-stat=fga]').text.strip())
 
-                if row.select_one('[data-stat=fg_pct]').text.strip() == "":
-                    d['FG_PCT'] = float(0)
-                else:
-                    d['FG_PCT'] = float(row.select_one(
-                        '[data-stat=fg_pct]').text.strip())
+                    if row.select_one('[data-stat=fg_pct]').text.strip() == "":
+                        d['FG_PCT'] = float(0)
+                    else:
+                        d['FG_PCT'] = float(row.select_one(
+                            '[data-stat=fg_pct]').text.strip())
 
-                d['3PM_Total'] = float(row.select_one(
-                    '[data-stat=fg3]').text.strip())
-                d['3PA_Total'] = float(row.select_one(
-                    '[data-stat=fg3a]').text.strip())
+                    d['3PM_Total'] = float(row.select_one(
+                        '[data-stat=fg3]').text.strip())
+                    d['3PA_Total'] = float(row.select_one(
+                        '[data-stat=fg3a]').text.strip())
 
-                if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
-                    d['3P_PCT'] = float(0)
-                else:
-                    d['3P_PCT'] = float(row.select_one(
-                        '[data-stat=fg3_pct]').text.strip())
+                    if row.select_one('[data-stat=fg3_pct]').text.strip() == "":
+                        d['3P_PCT'] = float(0)
+                    else:
+                        d['3P_PCT'] = float(row.select_one(
+                            '[data-stat=fg3_pct]').text.strip())
 
-                d['2PM_Total'] = float(row.select_one(
-                    '[data-stat=fg2]').text.strip())
-                d['2PA_Total'] = float(row.select_one(
-                    '[data-stat=fg2a]').text.strip())
+                    d['2PM_Total'] = float(row.select_one(
+                        '[data-stat=fg2]').text.strip())
+                    d['2PA_Total'] = float(row.select_one(
+                        '[data-stat=fg2a]').text.strip())
 
-                if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
-                    d['2P_PCT'] = float(0)
-                else:
-                    d['2P_PCT'] = float(row.select_one(
-                        '[data-stat=fg2_pct]').text.strip())
+                    if row.select_one('[data-stat=fg2_pct]').text.strip() == "":
+                        d['2P_PCT'] = float(0)
+                    else:
+                        d['2P_PCT'] = float(row.select_one(
+                            '[data-stat=fg2_pct]').text.strip())
 
-                if row.select_one('[data-stat=efg_pct]').text.strip() == "":
-                    d['EFG_PCT'] = float(0)
-                else:
-                    d['EFG_PCT'] = float(row.select_one(
-                        '[data-stat=efg_pct]').text.strip())
+                    if row.select_one('[data-stat=efg_pct]').text.strip() == "":
+                        d['EFG_PCT'] = float(0)
+                    else:
+                        d['EFG_PCT'] = float(row.select_one(
+                            '[data-stat=efg_pct]').text.strip())
 
-                d['FTM_Total'] = float(row.select_one(
-                    '[data-stat=ft]').text.strip())
-                d['FTA_Total'] = float(row.select_one(
-                    '[data-stat=fta]').text.strip())
+                    d['FTM_Total'] = float(row.select_one(
+                        '[data-stat=ft]').text.strip())
+                    d['FTA_Total'] = float(row.select_one(
+                        '[data-stat=fta]').text.strip())
 
-                if row.select_one('[data-stat=ft_pct]').text.strip() == "":
-                    d['FT_PCT'] = float(0)
-                else:
-                    d['FT_PCT'] = float(row.select_one(
-                        '[data-stat=ft_pct]').text.strip())
+                    if row.select_one('[data-stat=ft_pct]').text.strip() == "":
+                        d['FT_PCT'] = float(0)
+                    else:
+                        d['FT_PCT'] = float(row.select_one(
+                            '[data-stat=ft_pct]').text.strip())
 
-                d['DRB_Total'] = float(row.select_one(
-                    '[data-stat=drb]').text.strip())
-                d['ORB_Total'] = float(row.select_one(
-                    '[data-stat=orb]').text.strip())
-                d['TRB_Total'] = float(row.select_one(
-                    '[data-stat=trb]').text.strip())
-                d['AST_Total'] = float(row.select_one(
-                    '[data-stat=ast]').text.strip())
-                d['STL_Total'] = float(row.select_one(
-                    '[data-stat=stl]').text.strip())
-                d['BLK_Total'] = float(row.select_one(
-                    '[data-stat=blk]').text.strip())
-                d['TOV_Total'] = float(row.select_one(
-                    '[data-stat=tov]').text.strip())
-                d['Fouls_Total'] = float(row.select_one(
-                    '[data-stat=pf]').text.strip())
-                d['Points_Total'] = float(row.select_one(
-                    '[data-stat=pts]').text.strip())
+                    d['DRB_Total'] = float(row.select_one(
+                        '[data-stat=drb]').text.strip())
+                    d['ORB_Total'] = float(row.select_one(
+                        '[data-stat=orb]').text.strip())
+                    d['TRB_Total'] = float(row.select_one(
+                        '[data-stat=trb]').text.strip())
+                    d['AST_Total'] = float(row.select_one(
+                        '[data-stat=ast]').text.strip())
+                    d['STL_Total'] = float(row.select_one(
+                        '[data-stat=stl]').text.strip())
+                    d['BLK_Total'] = float(row.select_one(
+                        '[data-stat=blk]').text.strip())
+                    d['TOV_Total'] = float(row.select_one(
+                        '[data-stat=tov]').text.strip())
+                    d['Fouls_Total'] = float(row.select_one(
+                        '[data-stat=pf]').text.strip())
+                    d['Points_Total'] = float(row.select_one(
+                        '[data-stat=pts]').text.strip())
 
-                data.append(d)
+                    data.append(d)
 
-        start_year += 1
-        sleep(3)
+            start_year += 1
+            sleep(3)
 
-    with open(f'{year_range[0]}-{year_range[1]}_totals.json', 'w') as f:
-        json.dump(data, f)
+        with open(f'{file_start}-{end_year}_totals_{fileNameEnd}.json', 'w') as f:
+            json.dump(data, f)
+        return
+
+    if reg_play == "Both":
+        cntr = 0
+        nameEnd = 'regular_season'
+        while cntr < 2:
+            actual_scrape(start_year, end_year, page_list[cntr], nameEnd)
+            # since the second list will always be a list with playoffs, we can do this
+            nameEnd = 'playoffs'
+            cntr += 1
+    elif reg_play == "Regular Season":
+        actual_scrape(start_year, end_year, page_list, 'regular_season')
+    elif reg_play == "Playoffs":
+        actual_scrape(start_year, end_year, page_list, 'playoffs')
     return
-
-#######################
 
 
 def list_creator(reg_play, user_start_year, user_end_year, type):
@@ -779,7 +877,7 @@ def list_creator(reg_play, user_start_year, user_end_year, type):
                 total_input = f'https://www.basketball-reference.com/leagues/NBA_{counter}_advanced.html'
                 advanced_pages.append(total_input)
                 play_off_pgs = f'https://www.basketball-reference.com/playoffs/NBA_{counter}_advanced.html'
-                advanced_pages.append(play_off_pgs)
+                advanced_pages_playoffs.append(play_off_pgs)
                 counter += 1
             return advanced_pages, advanced_pages_playoffs
     elif type == "per36":
@@ -810,7 +908,7 @@ def list_creator(reg_play, user_start_year, user_end_year, type):
                 per_36_playoff.append(play_off_pgs)
                 counter += 1
             return per_36_pages, per_36_playoff
-    elif type = "per100":
+    elif type == "per100":
         if reg_play == "Regular Season":
             per_100_poss = []
             counter = user_start_year
@@ -894,3 +992,8 @@ def list_creator(reg_play, user_start_year, user_end_year, type):
                 per_game_playoff.append(play_off_pgs)
                 counter += 1
             return per_game, per_game_playoff
+
+
+rpb = choice.Menu(['Playoffs', 'Regular Season', 'Both']).ask()
+years = userYears()
+advanced_scrape(rpb, years[0], years[1])
