@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import json
 import choice
 
-############################Years from User#####################################
+# Functions
 
 
 def userYears():
@@ -28,7 +28,7 @@ def userYears():
     return start, end
 
 
-def per_game_scrape(start_year, page_list):
+def per_game_scrape(reg_play, start_year, end_year):
     tp = "perG"
     page_list = list_creator(reg_play, start_year, end_year, tp)
 
@@ -535,7 +535,7 @@ def per_36_scrape(reg_play, start_year, end_year):
     return
 
 
-def per_100_scrape(start_year, page_list):
+def per_100_scrape(reg_play, start_year, end_year):
     tp = "per100"
     page_list = list_creator(reg_play, start_year, end_year, tp)
 
@@ -728,7 +728,7 @@ def per_100_scrape(start_year, page_list):
     return
 
 
-def totals_scrape(start_year, page_list):
+def totals_scrape(reg_play, start_year, end_year):
     tp = "totals"
     page_list = list_creator(reg_play, start_year, end_year, tp)
 
@@ -994,6 +994,46 @@ def list_creator(reg_play, user_start_year, user_end_year, type):
             return per_game, per_game_playoff
 
 
-rpb = choice.Menu(['Playoffs', 'Regular Season', 'Both']).ask()
-years = userYears()
-advanced_scrape(rpb, years[0], years[1])
+def bbref_scrape():
+    # This is to ask the nature of the data
+    print("Please select if you'd like to have your data from the playoffs, regular season, or both:\n")
+    rpb = choice.Menu(['Playoffs', 'Regular Season', 'Both']).ask()
+
+    # This is to ask the specific data required
+    print("Please select what data you'd like: \n")
+    data = 'something else'  # just to start the loop
+    wanted_data = []
+    while data != 'No more':
+        data = choice.Menu(['Totals', 'Advanced', 'Per 36',
+                            'Per 100', 'Per Game', 'All', 'No more']).ask()
+        if data != 'No more' and data != 'All' and data not in wanted_data:
+            wanted_data.append(data)
+        elif data != 'No more' and data != 'All and data in wanted_data:
+            print("Please try again. Do not select a source that you've already selected. If you're done please select the 'No more' option.\n")
+        elif data == 'All':
+            wanted_data.append('Totals')
+            wanted_data.append('Advanced')
+            wanted_data.append('Per 36')
+            wanted_data.append('Per 100')
+            wanted_data.append('Per Game')
+            data = 'No more'
+
+    years = userYears()
+
+    # This is to actually create whatever data that the user requested
+    for wd in wanted_data:
+        if wd == 'Advanced':
+            advanced_scrape(rpb, years[0], years[1])
+        elif wd == 'Totals':
+            totals_scrape(rpb, years[0], years[1])
+        elif wd == 'Per 36':
+            per_36_scrape(rpb, years[0], years[1])
+        elif wd == 'Per 100':
+            per_100_scrape(rpb, years[0], years[1])
+        elif wd == 'Per Game':
+            per_game_scrape(rpb, years[0], years[1])
+
+    return
+
+
+bbref_scrape()
