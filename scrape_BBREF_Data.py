@@ -922,7 +922,7 @@ def list_creator(reg_play, user_start_year, user_end_year, type):
             counter = user_start_year
             while counter <= user_end_year:
                 play_off_pgs = f'https://www.basketball-reference.com/playoffs/NBA_{counter}_per_poss.html'
-                per_36_playoff.append(play_off_pgs)
+                per_100_poss_playoff.append(play_off_pgs)
                 counter += 1
             return per_100_poss_playoff
         elif reg_play == "Both":
@@ -946,7 +946,7 @@ def list_creator(reg_play, user_start_year, user_end_year, type):
                 counter += 1
             return totals
         if reg_play == "Playoffs":
-            total_playoff = []
+            totals_playoff = []
             counter = user_start_year
             while counter <= user_end_year:
                 playoff_pgs = f'https://www.basketball-reference.com/playoffs/NBA_{counter}_totals.html'
@@ -955,7 +955,7 @@ def list_creator(reg_play, user_start_year, user_end_year, type):
             return totals_playoff
         if reg_play == "Both":
             totals_season = []
-            total_playoff = []
+            totals_playoff = []
             counter = user_start_year
             while counter <= user_end_year:
                 total_input = f'https://www.basketball-reference.com/leagues/NBA_{counter}_totals.html'
@@ -1008,9 +1008,9 @@ def bbref_scrape():
                             'Per 100', 'Per Game', 'All', 'No more']).ask()
         if data != 'No more' and data != 'All' and data not in wanted_data:
             wanted_data.append(data)
-        elif data != 'No more' and data != 'All and data in wanted_data:
-            print("Please try again. Do not select a source that you've already selected. If you're done please select the 'No more' option.\n")
-        elif data == 'All':
+        elif data != 'No more' and data != 'All' and data in wanted_data:
+            print("Please try again. Do not select a source that you've already selected and please do not select 'All' if you've already selected a source. If you're done please select the 'No more' option.\n")
+        elif data == 'All' and not wanted_data:
             wanted_data.append('Totals')
             wanted_data.append('Advanced')
             wanted_data.append('Per 36')
