@@ -68,22 +68,24 @@ reg_notLBJ_year_obs['WS'].describe()
 adv_pf_notLBJ = adv_pf_notLBJ.loc[adv_pf_notLBJ['WS'] >= 1]
 adv_reg_notLBJ = adv_reg_notLBJ.loc[adv_reg_notLBJ['WS'] >= 6]
 
-test = adv_pf_notLBJ.groupby('Year')
-test.head(10)
-
+# Grouping all the other players by year
+adv_pf_notLBJ = adv_pf_notLBJ.groupby('Year')
+adv_reg_notLBJ = adv_reg_notLBJ.groupby('Year')
 
 # Plots
+
+lockout_pf = adv_playoff_LBJ.loc[adv_playoff_LBJ['Year'] == 2012]
+lockout_reg = adv_reg_LBJ.loc[adv_reg_LBJ['Year'] == 2012]
 
 # LBJ WS vs Mean WS
 axes = plt.gca()
 adv_playoff_LBJ.plot(kind='line', x='Year', y='WS',
                      color='red', label='LeBron James', ax=axes)
-test['WS'].mean().plot(kind='line', x='Year', y='WS',
-                       color='blue', label='League Average WS', ax=axes)
+adv_pf_notLBJ['WS'].mean().plot(kind='line', x='Year', y='WS',
+                                color='blue', label='League Average WS', ax=axes)
 plt.legend(loc='upper left')
 plt.title('LeBron James Playoff WS vs Average WS of the League')
 plt.ylabel('Playoff WS')
-plt.xticks(np.arange(2006, 2018, 1), np.arange(2006, 2018, 1))
 plt.show()
 plt.savefig('WS_PF_LBJvsLeagueAVG.png')
 
@@ -95,6 +97,7 @@ adv_reg_LBJ['TS_Percentage'] = adv_reg_LBJ['TS_Percentage'] * 100
 
 # The actual plotting
 axes = plt.gca()
+
 adv_playoff_LBJ.plot(kind='line', x='Year', y='TS_Percentage',
                      color='red', label='Playoffs TS%', ax=axes)
 adv_reg_LBJ.plot(kind='line', x='Year', y='TS_Percentage',
@@ -103,9 +106,31 @@ adv_playoff_LBJ.plot(kind='line', x='Year', y='USG_Percentage',
                      color='red', label='Playoff USG%', ax=axes, linestyle='dashed')
 adv_reg_LBJ.plot(kind='line', x='Year', y='USG_Percentage',
                  color='blue', label='Regular Season USG%', ax=axes, linestyle='dashed')
+
+
+box = axes.get_position()
+axes.set_position([box.x0, box.y0, box.width * 0.9, box.height])
 plt.title("LeBron's Playoff TS% vs Regular Season TS%")
 plt.ylabel('Percentage')
-plt.xticks(np.arange(2006, 2018, 1), np.arange(2006, 2018, 1))
-plt.legend(loc='upper left')
+plt.legend(bbox_to_anchor=(1.04, 1), loc='upper left')
 plt.show()
 plt.savefig('TSPct_LBJ.png')
+
+# LBJ compared to the best WS league wide
+axes = plt.gca()
+
+adv_pf_notLBJ['WS'].max().plot(kind='line', x='Year', y='WS',
+                               color='red', label='Best of the Rest WS Playoffs', ax=axes, linestyle='dashed')
+adv_reg_notLBJ['WS'].max().plot(kind='line', x='Year', y='WS',
+                                color='blue', label='Best of the Rest WS Regular Season', ax=axes, linestyle='dashed')
+adv_playoff_LBJ.plot(kind='line', x='Year', y='WS',
+                     color='red', label='LBJ WS Playoffs', ax=axes)
+adv_reg_LBJ.plot(kind='line', x='Year', y='WS', color='blue',
+                 label='LBJ WS Regular Season', ax=axes,)
+
+box = axes.get_position()
+axes.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+plt.legend(bbox_to_anchor=(1.04, 1), loc='upper left')
+plt.title('LeBron James WS v Best of the Rest')
+plt.ylabel('Playoff WS')
+plt.show()
