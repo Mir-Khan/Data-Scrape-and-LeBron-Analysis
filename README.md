@@ -88,7 +88,7 @@ This graph highlights LeBron's TS% to his USG%. Some takeaways from this graph:
 ![WS Comparison of LeBron vs the best of the rest of the league in both the regular season and playoffs](https://github.com/Mir-Khan/NBA-Data-Analysis/blob/master/LBJ%20WS%20Comparisons.png)
 
 - LeBron's WS for the regular season was the highest in the league from 2009-2013
-- LeBron's WS for the most part is above 12.5, meaning that he alone added 12.5 or more total wins for the season. To put that into perspective, almost 15% or more of the wins a team that LeBron has obtained are attributed to his being there.
+- LeBron's WS for the most part is above 12.5, meaning that he alone added 12.5 or more total wins for the season. To put that into perspective, almost 15% or more of the wins a team that has LeBron are attributed to his being there.
   - Note that this of course doesn't discriminate between which games were actually attributed to James but instead is insightful into seeing how many wins his teams achieved because they had James
 - LeBron suffered a major injury in the 2014-2015 NBA season that caused him to miss 2 weeks. This explains his lowest WS overall.
 - Playoffs is much more erratic in general but in general, **there were only 4 times throughout LeBron's playoff career that someone has obtained a higher WS than him.** This speaks to the value of LeBron come playoff time.
@@ -102,6 +102,14 @@ This graph highlights LeBron's TS% to his USG%. Some takeaways from this graph:
 - Generally, LeBron is not the best defender even though he is above average. The only times he had the highest DWS were in 2007, 2011-13, and 2016.
 - He tied Kevin Garnett in 2012 and Draymond Green in 2016 for having the highest playoff DWS.
 - Even though this indicates that LeBron isn't as superb on defense as he is on offense, **defensive stats should always be taken with a grain of salt.** Defense in the NBA is incredibly difficult and has a multitude of factors no statistic or metric can accurately capture. Despite this, it may be helpful to look into these statistics as a way of trying to examine player profiles purely on the surface level.
+
+## Conclusions
+
+LeBron has been dominant during this 12 year period (2006-2018), and has been consistently the best player or one of the best players in the NBA. This is amazing as he's essentially been playing at a high level for almost the entirety of his career in the NBA. Even though he is probably not going to be remembered for his defensive prowess, he is no slouch either. And, his USG% reflects how much he actually imposes his will on whatever team he's on: if LeBron is on your roster, it's LeBron's team from then on.
+
+## Author's Thoughts
+
+In general, this project is a good stepping stone to observing other statistics of pretty much anyone in the NBA thanks to the versatility of the script. I will most likely use what I have created and learned here for other projects in the future. I hope the visualizations might help anyone who wanted to learn how to do it just like I did at the start of this project.
 
 ## Other Libraries Used
 
@@ -117,6 +125,10 @@ The libraries that were used for the creation of the script include:
 The other libraries used for the analysis are as followed:
 * [pandas](https://pandas.pydata.org/)
 * [matplotlib](https://matplotlib.org/)
+
+## Authors
+
+The script, data visualizations, and the data analysis write-ups were all created by Mir Khan. Find my Github page [here](https://github.com/Mir-Khan).
 
 ### Acknowledgements
 I learned how to scrape data from LearnDataSci's tutorial here, check it out **[here.](https://github.com/LearnDataSci/article-resources/blob/master/Ultimate%20Guide%20to%20Web%20Scraping/Part%201%20-%20Requests%20and%20BeautifulSoup/notebook.ipynb)**
