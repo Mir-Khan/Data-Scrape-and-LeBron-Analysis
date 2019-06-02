@@ -74,9 +74,6 @@ adv_reg_notLBJ = adv_reg_notLBJ.groupby('Year')
 
 # Plots
 
-lockout_pf = adv_playoff_LBJ.loc[adv_playoff_LBJ['Year'] == 2012]
-lockout_reg = adv_reg_LBJ.loc[adv_reg_LBJ['Year'] == 2012]
-
 # LBJ WS vs Mean WS
 axes = plt.gca()
 adv_playoff_LBJ.plot(kind='line', x='Year', y='WS',
@@ -86,8 +83,10 @@ adv_pf_notLBJ['WS'].mean().plot(kind='line', x='Year', y='WS',
 plt.legend(loc='upper left')
 plt.title('LeBron James Playoff WS vs Average WS of the League')
 plt.ylabel('Playoff WS')
+plt.annotate('2011-2012 Lockout Season', xy=(2012, 5.8), xytext=(2015.3, 5.7),
+             ha='center', arrowprops=dict(arrowstyle='wedge', connectionstyle='arc3, rad=0'))
+plt.savefig('WS_PF_LBJvsLeagueAVG.png', dpi=200)
 plt.show()
-plt.savefig('WS_PF_LBJvsLeagueAVG.png')
 
 # LBJ TS% Regular Season vs Playoffs with USG%
 
@@ -110,13 +109,16 @@ adv_reg_LBJ.plot(kind='line', x='Year', y='USG_Percentage',
 
 box = axes.get_position()
 axes.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-plt.title("LeBron's Playoff TS% vs Regular Season TS%")
+plt.title("LeBron's TS% vs USG%")
 plt.ylabel('Percentage')
 plt.legend(bbox_to_anchor=(1.04, 1), loc='upper left')
+plt.annotate('Irving and Love injured in the playoffs', xy=(2015, 37.6), xytext=(
+    2014, 42), ha='center', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'))
+plt.savefig('TSPct_LBJ.png', dpi=100, bbox_inches='tight')
 plt.show()
-plt.savefig('TSPct_LBJ.png')
 
-# LBJ compared to the best WS league wide
+
+# LBJ compared to the rest of the league's best WS
 axes = plt.gca()
 
 adv_pf_notLBJ['WS'].max().plot(kind='line', x='Year', y='WS',
@@ -133,4 +135,46 @@ axes.set_position([box.x0, box.y0, box.width * 0.9, box.height])
 plt.legend(bbox_to_anchor=(1.04, 1), loc='upper left')
 plt.title('LeBron James WS v Best of the Rest')
 plt.ylabel('Playoff WS')
+
+# Annotations
+# Injury
+plt.annotate('LeBron suffers a back injury', xy=(2015, 10.3), xytext=(
+    2015, 8), ha='center', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'), fontsize='small')
+
+# Regular Season Player Names
+plt.annotate('Dirk Nowitzki', xy=(2006, 17.7), xytext=(
+    2007.3, 20.3), ha='center', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'), fontsize='small', fontweight='bold')
+plt.annotate('Dirk Nowitzki', xy=(2007, 16.3), xytext=(
+    2007.5, 12), ha='center', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'), fontsize='small', fontweight='bold')
+plt.annotate('Chris Paul', xy=(2008, 17.8), xytext=(
+    2007.5, 18.2), ha='center', fontsize='small', fontweight='bold')
+plt.annotate('Kevin Durant', xy=(2014, 19.2), xytext=(
+    2014.1, 20), ha='center', fontsize='small', fontweight='bold')
+plt.annotate('James Harden', xy=(2015, 16.4), xytext=(
+    2015.39, 15.7), ha='center', fontsize='small', fontweight='bold')
+plt.annotate('Steph Curry', xy=(2016, 17.9), xytext=(
+    2016, 18.1), ha='center', fontsize='small', fontweight='bold')
+plt.annotate('James Harden', xy=(2017, 15), xytext=(
+    2016.2, 14), ha='center', fontsize='small', fontweight='bold')
+plt.annotate('James Harden', xy=(2018, 15.4), xytext=(
+    2016.72, 11.2), ha='center', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'), fontsize='small', fontweight='bold')
+
+# Playoff Player Names
+plt.annotate('Dirk Nowitzki', xy=(2006, 5.4), xytext=(
+    2007.4, 9), ha='center', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'), fontsize='small', fontweight='bold')
+plt.annotate('Kevin Garnett', xy=(2008, 4.1), xytext=(
+    2009, 1), ha='center', fontsize='small', fontweight='bold', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'))
+plt.annotate('Pau Gasol', xy=(2010, 4.3), xytext=(
+    2010, 6), ha='center', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'), fontsize='small', fontweight='bold')
+plt.annotate('James Harden', xy=(2015, 3.9), xytext=(
+    2015, 6), ha='center', fontsize='small', fontweight='bold', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'))
+
+plt.savefig('LBJ WS Comparisons.png', dpi=100, bbox_inches='tight')
 plt.show()
+
+# These are for the annotations of the other player names, I wanted to show who exactly we're comparing to LeBron
+adv_reg_notLBJ.apply(lambda x: x.loc[x['WS'].idxmax(), ['Name', 'WS']])
+
+adv_pf_notLBJ.apply(lambda x: x.loc[x['WS'].idxmax(), ['Name', 'WS']])
+
+adv_playoff_LBJ[['Year', 'WS']]
