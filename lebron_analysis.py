@@ -177,4 +177,29 @@ adv_reg_notLBJ.apply(lambda x: x.loc[x['WS'].idxmax(), ['Name', 'WS']])
 
 adv_pf_notLBJ.apply(lambda x: x.loc[x['WS'].idxmax(), ['Name', 'WS']])
 
-adv_playoff_LBJ[['Year', 'WS']]
+# DWS Analysis
+axes = plt.gca()
+
+adv_playoff_LBJ.plot(kind='line', x='Year', y='DWS',
+                     color='red', label='LBJ DWS Playoffs', ax=axes)
+adv_pf_notLBJ['DWS'].max().plot(kind='line', x='Year', y='DWS',
+                                color='blue', label='Best Leaguewide Playoff DWS')
+
+plt.title("LeBron's Playoff DWS vs Leaguewide DWS")
+plt.ylabel('Playoff DWS')
+plt.legend(loc='upper right')
+
+# annotations
+
+plt.annotate('Kevin Garnett', xy=(2012, 1.6), xytext=(2012, 1.2), ha='center', fontsize='small',
+             color='green', arrowprops=dict(arrowstyle='<|-', connectionstyle='arc3, rad=0'))
+plt.annotate('Draymond Green', xy=(2016, 1.5), xytext=(2016, 1), ha='center', arrowprops=dict(
+    arrowstyle='<|-', connectionstyle='arc3, rad=0'), fontsize='small', color='green')
+
+plt.savefig('LBJ DWS Comparisons.png', dpi=100, bbox_inches='tight')
+plt.show()
+
+
+# Getting the names for the annotations again
+adv_pf_notLBJ.apply(lambda x: x.loc[x['DWS'].idxmax(), ['Name', 'DWS']])
+adv_playoff_LBJ[['Year', 'DWS']]
