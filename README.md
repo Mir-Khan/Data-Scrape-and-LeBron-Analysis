@@ -59,3 +59,38 @@ There are certain variables that are repeated throughout the script. Here are th
 - **user_end_year/end_year** - This variable is what holds the user inputted end year. It's used to help create a page list and to help create the file name. The name was shortened when called by the scraping functions in order to distinguish them.
 
 - **type/tp** - This variable helps tell the page list creating function what type of page list to create and it's called by that function from the individual page scraping functions.
+
+# LeBron Analysis
+This analysis provides a general overview of some of LeBron's advanced statistics (mainly WS) compared to the rest of the league.
+
+## Other Libraries Used
+The other libraries used for this analysis are as followed:
+- pandas
+- matplotlib
+
+
+## Notes About the Data
+There are some general notes about the data that should be mentioned.
+
+- The observations only include the years that LeBron made the playoffs, which were 2006-2018. This is because of the fact that I wanted to be able to easily compare regular season stats and playoff stats better.
+
+- The data containing the rest of the league was trimmed in order to be able to better observe the higher performers in the league. I did this through the **Win Share** metric. Why? This metric is probably the best one as it incorporates both defense and offense in its calculations.
+  - Because of this the data was filtered out. This was done by only including the players that had more than 1 WS in the playoffs, as adding a win in the playoffs is something that a lot of teams would appreciate.
+  - The regular season WS was filtered differently. The 2019 season saw the Sacramento Kings miss the playoffs in the Western Conference by 10 wins and the Hornets by 2 wins in the Eastern Conference. I opted to just use the average by these two and go for anyone who contributed by 6 or more wins in the regular season.
+
+## Graphs
+WS comparison to the mean of the rest of the league:
+![WS Comparison of LeBron vs the mean of of the league in both the regular season and playoffs](https://github.com/Mir-Khan/NBA-Data-Analysis/blob/master/WS_PF_LBJvsLeagueAVG.png)
+
+WS Comparison to the best of the rest of the league:
+![WS Comparison of LeBron vs the best of the rest of the league in both the regular season and playoffs](https://github.com/Mir-Khan/NBA-Data-Analysis/blob/master/LBJ%20WS%20Comparisons.png)
+
+DWS Comparison to the best of the rest of the league:
+![DWS Comparison of LeBron vs the best of the rest of the league](https://github.com/Mir-Khan/NBA-Data-Analysis/blob/master/LBJ%20DWS%20Comparisons.png)
+
+LeBron's True Shooting % compared to Usage Percentage:
+![LeBron's TS% compared to USG% in both the regular season and playofss](https://github.com/Mir-Khan/NBA-Data-Analysis/blob/master/TSPct_LBJ.png)
+
+
+
+#### Notes
