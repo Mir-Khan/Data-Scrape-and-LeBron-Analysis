@@ -1,7 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
-
 
 adv_reg = pd.read_json(
     r'C:\Users\Mir\Documents\GitHub\NBA__Project\2014-2019_json_files\2004-2019_advanced_stats_regular_season.json')
@@ -59,12 +57,6 @@ reg_notLBJ_year_obs['WS'].describe()
 
 # We just have to adjust the data based on WS since its just OWS and DWS combined
 
-# I opted for everybody that contributed to 1 or more wins in the playoffs, and 6 or more in the regular season, as I believe the highest performers would achieve these numbers even in their down years based on the statistics I saw from the describe functions
-
-# 10 more wins in the regular season for the 9th seed Kings in the 2019 season, for example, would've allowed them to enter the playoffs. In the East, this is a much smaller number (2) for the 9th seed Hornets. Since the West has much tougher competition, I opted for 6 as this is the average between the 2. My thinking is that a player adding 6 wins to a team is much more valuable than others.
-
-# Playoffs are a different story, anyone who can contribute a win is a valuable asset to a team come playoff time.
-
 adv_pf_notLBJ = adv_pf_notLBJ.loc[adv_pf_notLBJ['WS'] >= 1]
 adv_reg_notLBJ = adv_reg_notLBJ.loc[adv_reg_notLBJ['WS'] >= 6]
 
@@ -85,7 +77,7 @@ plt.title('LeBron James Playoff WS vs Average WS of the League')
 plt.ylabel('Playoff WS')
 plt.annotate('2011-2012 Lockout Season', xy=(2012, 5.8), xytext=(2015.3, 5.7),
              ha='center', arrowprops=dict(arrowstyle='wedge', connectionstyle='arc3, rad=0'))
-plt.savefig('WS_PF_LBJvsLeagueAVG.png', dpi=200)
+plt.savefig('WS_PF_LBJvsLeagueAVG.png', dpi=100)
 plt.show()
 
 # LBJ TS% Regular Season vs Playoffs with USG%
