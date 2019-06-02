@@ -55,7 +55,7 @@ There are some general notes about the data that should be mentioned.
 
 - The observations only include the years that LeBron made the playoffs, which were 2006-2018. This is because of the fact that I wanted to be able to easily compare regular season stats and playoff stats better.
 
-- The data containing the rest of the league was trimmed in order to be able to better observe the higher performers in the league. I did this through the [**Win Share**]((https://www.sportingcharts.com/dictionary/nba/defensive-win-shares-dws.aspx) metric. Why? This metric is probably the best one as it incorporates both defense and offense in its calculations.
+- The data containing the rest of the league was trimmed in order to be able to better observe the higher performers in the league. I did this through the [**Win Share**](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwiyg5bn8MriAhVqhOAKHa2vB8wQFjAAegQIAhAB&url=https%3A%2F%2Fwww.basketball-reference.com%2Fabout%2Fws.html&usg=AOvVaw0jxffVleHWloZae-NqAxlJ) metric. Why? This metric is probably the best one as it incorporates both defense and offense in its calculations.
   - Because of this the data was filtered out. This was done by only including the players that had more than 1 WS in the playoffs, as adding a win in the playoffs is something that a lot of teams would appreciate.
   - The regular season WS was filtered differently. The 2019 season saw the Sacramento Kings miss the playoffs in the Western Conference by 10 wins and the Hornets by 2 wins in the Eastern Conference. I opted to just use the average by these two and go for anyone who contributed by 6 or more wins in the regular season.
 
@@ -92,7 +92,7 @@ This graph highlights LeBron's TS% to his USG%. Some takeaways from this graph:
  - Note that this of course doesn't discriminate between which games were actually attributed to James but instead is insightful into seeing how many wins his teams achieved because they had James
 - LeBron suffered a major injury in the 2014-2015 NBA season that caused him to miss 2 weeks. This explains his lowest WS overall.
 - Playoffs is much more erratic in general but in general, **there were only 4 times throughout LeBron's playoff career that someone has obtained a higher WS than him.** This speaks to the value of LeBron come playoff time.
-- Finally, WS seems to heavily lean on players that are offensively focused. This can be seen in the regular season, as the players who had a higher regular season WS than LeBron are, generally speaking, offensive superstars. This metric isn't perfect (like all metrics) and thus it's a good idea to also look into something like **Defensive Win Shares**.
+- Finally, WS seems to heavily lean on players that are offensively focused. This can be seen in the regular season, as the players who had a higher regular season WS than LeBron are, generally speaking, offensive superstars. This metric isn't perfect (like all metrics) and thus it's a good idea to also look into something like [**Defensive Win Shares**](https://www.sportingcharts.com/dictionary/nba/defensive-win-shares-dws.aspx).
 
 
 **DWS Comparison to the best of the rest of the league:**
