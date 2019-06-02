@@ -75,11 +75,12 @@ adv_pf_notLBJ['WS'].mean().plot(kind='line', x='Year', y='WS',
 plt.legend(loc='upper left')
 plt.title('LeBron James Playoff WS vs Average WS of the League')
 plt.ylabel('Playoff WS')
+plt.annotate("Mavs upset the Heat in the 2011 Finals", xy=(2011, 3.8), xytext=(2014, 2.2),
+             ha='center', arrowprops=dict(arrowstyle='wedge', connectionstyle='arc3, rad=0'))
 plt.annotate('2011-2012 Lockout Season', xy=(2012, 5.8), xytext=(2015.3, 5.7),
              ha='center', arrowprops=dict(arrowstyle='wedge', connectionstyle='arc3, rad=0'))
 plt.savefig('WS_PF_LBJvsLeagueAVG.png', dpi=100)
 plt.show()
-
 # LBJ TS% Regular Season vs Playoffs with USG%
 
 # Adjusting the TS% to make sure they're at the same scale as the USG%
