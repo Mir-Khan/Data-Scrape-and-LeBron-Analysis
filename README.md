@@ -76,11 +76,11 @@ This graph shows us that compared to the rest of the league, LeBron is certainly
 This graph highlights LeBron's TS% to his USG%. Some takeaways from this graph:
 - Most of the time, it seems to be that his USG% in the regular season is consistently around 30%. This makes sense as LeBron was always the best player on whatever team he was on throughout these years and he's a ballhandler.
 - His playoff USG% is a different story. It's erratic to say the least but there are 2 clear outliers.
- - 2011 is his lowest playoff USG%, this is also considered LeBron's worst playoff run.
- - 2015 is his highest playoff USG%, this can be easily attributed to the fact that both of his All-Star teammates went down during the playoffs.
+  - 2011 is his lowest playoff USG%, this is also considered LeBron's worst playoff run.
+  - 2015 is his highest playoff USG%, this can be easily attributed to the fact that both of his All-Star teammates went down during the playoffs.
 - 2015, coincidentally, is his worst playoff run TS%. My hypothesis? Since LeBron was the main focal point of the offense without Irving in the finals and Love for most of the playoffs, he was probably forcing shots that just weren't there and his TS% suffered as a result.
- - Generally, LeBron's TS% was above 55% in the regular season, which is very good. In the playoffs this was more erratic, but generally speaking he never dipped below 50% other than 2015.
- - LeBron's 2013-14 playoff TS% was ridiculously high. Probably as a result of the earlier rounds prior to the finals. It might be interesting to just look at his stats in his games in the finals.
+  - Generally, LeBron's TS% was above 55% in the regular season, which is very good. In the playoffs this was more erratic, but generally speaking he never dipped below 50% other than 2015.
+  - LeBron's 2013-14 playoff TS% was ridiculously high. Probably as a result of the earlier rounds prior to the finals. It might be interesting to just look at his stats in his games in the finals.
 
 
 **WS Comparison to the best of the rest of the league:**
@@ -89,7 +89,7 @@ This graph highlights LeBron's TS% to his USG%. Some takeaways from this graph:
 
 - LeBron's WS for the regular season was the highest in the league from 2009-2013
 - LeBron's WS for the most part is above 12.5, meaning that he alone added 12.5 or more total wins for the season. To put that into perspective, almost 15% or more of the wins a team that LeBron has obtained are attributed to his being there.
- - Note that this of course doesn't discriminate between which games were actually attributed to James but instead is insightful into seeing how many wins his teams achieved because they had James
+  - Note that this of course doesn't discriminate between which games were actually attributed to James but instead is insightful into seeing how many wins his teams achieved because they had James
 - LeBron suffered a major injury in the 2014-2015 NBA season that caused him to miss 2 weeks. This explains his lowest WS overall.
 - Playoffs is much more erratic in general but in general, **there were only 4 times throughout LeBron's playoff career that someone has obtained a higher WS than him.** This speaks to the value of LeBron come playoff time.
 - Finally, WS seems to heavily lean on players that are offensively focused. This can be seen in the regular season, as the players who had a higher regular season WS than LeBron are, generally speaking, offensive superstars. This metric isn't perfect (like all metrics) and thus it's a good idea to also look into something like [**Defensive Win Shares**](https://www.sportingcharts.com/dictionary/nba/defensive-win-shares-dws.aspx).
