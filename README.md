@@ -1,3 +1,16 @@
+# Table of Contents
+- [Data Scraping Script](https://github.com/Mir-Khan/NBA-Data-Analysis#data-scraping-script)
+  - [Notes about the script](https://github.com/Mir-Khan/NBA-Data-Analysis#notes-about-the-scraping-script)
+  - [Variables Notes](https://github.com/Mir-Khan/NBA-Data-Analysis#variable-notes)
+- [LeBron Analysis](https://github.com/Mir-Khan/NBA-Data-Analysis#lebron-analysis)
+  - [Graphs and Takeways](https://github.com/Mir-Khan/NBA-Data-Analysis#graphs-and-takeaways)
+  - [Conclusions](https://github.com/Mir-Khan/NBA-Data-Analysis#conclusions)
+- [Author's Thoughts](https://github.com/Mir-Khan/NBA-Data-Analysis#authors-thoughts)
+- [Other Libraries Used](https://github.com/Mir-Khan/NBA-Data-Analysis#other-libraries-used)
+- [Authors](https://github.com/Mir-Khan/NBA-Data-Analysis#authors)
+  - [Acknowledgements](https://github.com/Mir-Khan/NBA-Data-Analysis#acknowledgements)
+
+
 # NBA Data Analyzation
 A short project that examines player statistics collected from basketball reference.
 
